@@ -2,7 +2,7 @@ import { Error, Query, Schema, model } from 'mongoose';
 import config from '../../config';
 import bcrypt from 'bcrypt';
 import { IUser, UserModel } from './user.interface';
-import { Role, USER_ROLE } from './user.constants';
+import { Login_With, Role, USER_ROLE } from './user.constants';
 
 const userSchema: Schema<IUser> = new Schema(
   {
@@ -88,7 +88,11 @@ const userSchema: Schema<IUser> = new Schema(
       type: Boolean,
       default: false,
     },
-
+    loginWth: {
+      type: String,
+      enum: Login_With,
+      default: Login_With.credentials,
+    },
     verification: {
       otp: {
         type: Schema.Types.Mixed,
@@ -103,18 +107,21 @@ const userSchema: Schema<IUser> = new Schema(
       },
     },
 
-    loginDevice: {
+    device: {
       ip: {
         type: String,
-        default: null,
+      },
+      browser: {
+        type: String,
+      },
+      os: {
+        type: String,
       },
       device: {
         type: String,
-        default: null,
       },
-      time: {
+      lastLogin: {
         type: String,
-        default: null,
       },
     },
   },

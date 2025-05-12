@@ -7,6 +7,14 @@ export const USER_ROLE = {
   delivery_man: 'delivery_man',
 };
 
+export enum Login_With {
+  google = 'google',
+  apple = 'apple',
+  facebook = 'facebook',
+  credentials = 'credentials',
+}
+
+
 export const gender = ['Male', 'Female', 'Others'];
 export const Role = [
   'admin',

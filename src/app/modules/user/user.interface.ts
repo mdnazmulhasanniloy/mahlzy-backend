@@ -24,15 +24,18 @@ export interface IUser {
   needsPasswordChange: boolean;
   passwordChangedAt?: Date;
   isDeleted: boolean;
+  loginWth: 'google' | 'apple' | 'facebook' | 'credentials';
   verification: {
     otp: string | number;
     expiresAt: Date;
     status: boolean;
   };
-  loginDevice: {
+  device: {
     ip: string;
+    browser: string;
+    os: string;
     device: string;
-    time: string;
+    lastLogin: string;
   };
 }
 
