@@ -33,6 +33,16 @@ const getMyAddOne = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getResturantAddOne = catchAsync(async (req: Request, res: Response) => {
+  req.query['author'] = req.params.userId;
+  const result = await addOneService.getAllAddOne(req.query);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'My addOne fetched successfully',
+    data: result,
+  });
+});
 
 const getAddOneById = catchAsync(async (req: Request, res: Response) => {
   const result = await addOneService.getAddOneById(req.params.id);
@@ -74,4 +84,5 @@ export const addOneController = {
   updateAddOne,
   deleteAddOne,
   getMyAddOne,
+  getResturantAddOne,
 };
