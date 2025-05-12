@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Welcome to [Your Platform Name]</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f6f8;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        background-color: #ffffff;
+        margin: 30px auto;
+        padding: 30px;
+        max-width: 600px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
+      .header {
+        text-align: center;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eaeaea;
+      }
+      .header h2 {
+        color: #333333;
+      }
+      .content {
+        padding: 20px 0;
+      }
+      .content p {
+        color: #555555;
+        line-height: 1.6;
+      }
+      .details {
+        background-color: #f9f9f9;
+        border-left: 4px solid #007bff;
+        padding: 15px;
+        margin: 20px 0;
+      }
+      .footer {
+        font-size: 13px;
+        text-align: center;
+        color: #999999;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h2>Welcome, {{name}}!</h2>
+      </div>
+      <div class="content">
+        <p>
+          Congratulations! You've been registered as a
+          <strong>Delivery Man</strong> for the shop
+          <strong>{{shopName}}</strong>.
+        </p>
+        <p>Please find your login credentials below:</p>
+
+        <div class="details">
+          <p><strong>Email:</strong> {{email}}</p>
+          <p><strong>Temporary Password:</strong> {{password}}</p>
+          <p><strong>Role:</strong> Delivery Man</p>
+        </div>
+
+        <p>
+          We recommend logging in and updating your password immediately to
+          ensure the security of your account.
+        </p>
+
+        <p>
+          If you have any questions or need assistance, feel free to reach out
+          to our support team.
+        </p>
+      </div>
+      <div class="footer">
+        &copy; 2025 Mahlzy. All rights reserved.
+      </div>
+    </div>
+  </body>
+</html>
