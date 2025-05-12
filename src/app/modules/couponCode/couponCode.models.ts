@@ -28,6 +28,10 @@ const couponCodeSchema = new Schema<ICouponCode>(
   },
 );
 
+couponCodeSchema.statics.findByCode = async (code: string) => {
+  return CouponCode.findOne({ code: code });
+};
+
 const CouponCode = model<ICouponCode, ICouponCodeModules>(
   'CouponCode',
   couponCodeSchema,
