@@ -29,7 +29,7 @@ const addOneSchema = new Schema<IAddOne>(
       type: String,
       required: true,
     },
-    isDeleted: { type: Boolean, default: false },
+    isDeleted: { type: Boolean, default: false },  
   },
   {
     timestamps: true,

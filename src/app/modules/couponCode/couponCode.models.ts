@@ -6,10 +6,11 @@ const couponCodeSchema = new Schema<ICouponCode>(
   {
     resturant: {
       types: Types.ObjectId,
-      ref: '',
+      ref: 'User',
     },
     code: {
       type: String,
+      unique: true,
       default: () => generateCryptoString(10),
     },
     expiredAt: {

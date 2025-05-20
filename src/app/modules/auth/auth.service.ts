@@ -24,7 +24,7 @@ import { Login_With, USER_ROLE } from '../user/user.constants';
 import { Request } from 'express';
 
 // Login
-const login = async (payload: TLogin) => {
+const login = async (payload: TLogin, req:Request) => {
   const user: IUser | null = await User.isUserExist(payload?.email);
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
@@ -57,6 +57,32 @@ const login = async (payload: TLogin) => {
     config.jwt_refresh_secret as string,
     config.jwt_refresh_expires_in as string,
   );
+
+
+  const ip =
+    req.headers['x-forwarded-for']?.toString().split(',')[0] ||
+    req.socket.remoteAddress ||
+    '';
+
+  const userAgent = req.headers['user-agent'] || '';
+  //@ts-ignore
+  const parser = new UAParser(userAgent);
+  const result = parser.getResult();
+  const data = {
+    device: {
+      ip: ip,
+      browser: result.browser.name,
+      os: result.os.name,
+      device: result.device.model || 'Desktop',
+      lastLogin: new Date().toISOString(),
+    },
+  };
+
+  await User.findByIdAndUpdate(user?._id, data, {
+    new: true,
+    upsert: false,
+  });
+
 
   return {
     user,

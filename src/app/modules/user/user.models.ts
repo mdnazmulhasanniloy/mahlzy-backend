@@ -68,12 +68,10 @@ const userSchema: Schema<IUser> = new Schema(
 
     location: {
       type: {
-        type: {
-          type: String,
-          default: 'Point',
-        },
-        coordinates: [Number],
+        type: String,
+        default: 'Point',
       },
+      coordinates: [Number],
     },
 
     needsPasswordChange: {

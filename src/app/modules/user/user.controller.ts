@@ -9,7 +9,7 @@ import { User } from './user.models';
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
   if (req?.file) {
-    req.body.image = await uploadToS3({
+    req.body.profile = await uploadToS3({
       file: req.file,
       fileName: `images/user/profile/${Math.floor(100000 + Math.random() * 900000)}`,
     });
@@ -59,7 +59,7 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
   await User.findById(req.params.id);
 
   if (req?.file) {
-    req.body.image = await uploadToS3({
+    req.body.profile = await uploadToS3({
       file: req.file,
       fileName: `images/user/profile/${Math.floor(100000 + Math.random() * 900000)}`,
     });
@@ -77,7 +77,7 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
 const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
   await User.findById(req.user.userId);
   if (req?.file) {
-    req.body.image = await uploadToS3({
+    req.body.profile = await uploadToS3({
       file: req.file,
       fileName: `images/user/profile/${Math.floor(100000 + Math.random() * 900000)}`,
     });

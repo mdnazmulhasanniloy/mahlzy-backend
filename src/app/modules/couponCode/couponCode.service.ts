@@ -1,4 +1,3 @@
-
 import httpStatus from 'http-status';
 import { ICouponCode } from './couponCode.interface';
 import CouponCode from './couponCode.models';
@@ -14,9 +13,11 @@ const createCouponCode = async (payload: ICouponCode) => {
 };
 
 const getAllCouponCode = async (query: Record<string, any>) => {
-query[""] = false;
-  const couponCodeModel = new QueryBuilder(CouponCode.find({isDeleted:false}), query)
-    .search([""])
+  const couponCodeModel = new QueryBuilder(
+    CouponCode.find({ isDeleted: false }),
+    query,
+  )
+    .search(['code'])
     .filter()
     .paginate()
     .sort()
@@ -39,6 +40,14 @@ const getCouponCodeById = async (id: string) => {
   return result;
 };
 
+const getCouponCodeByCode = async (code: string) => {
+  const result = await CouponCode.findByCode(code);
+  if (!result || result?.isDeleted) {
+    throw new Error('CouponCode not found!');
+  }
+  return result;
+};
+
 const updateCouponCode = async (id: string, payload: Partial<ICouponCode>) => {
   const result = await CouponCode.findByIdAndUpdate(id, payload, { new: true });
   if (!result) {
@@ -51,7 +60,7 @@ const deleteCouponCode = async (id: string) => {
   const result = await CouponCode.findByIdAndUpdate(
     id,
     { isDeleted: true },
-    { new: true }
+    { new: true },
   );
   if (!result) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete couponCode');
@@ -65,4 +74,5 @@ export const couponCodeService = {
   getCouponCodeById,
   updateCouponCode,
   deleteCouponCode,
+  getCouponCodeByCode,
 };
