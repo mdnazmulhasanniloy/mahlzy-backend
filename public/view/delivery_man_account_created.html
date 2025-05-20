@@ -1,84 +1,160 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Welcome to [Your Platform Name]</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f6f8;
-        margin: 0;
-        padding: 0;
-      }
-      .container {
-        background-color: #ffffff;
-        margin: 30px auto;
-        padding: 30px;
-        max-width: 600px;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-      }
-      .header {
-        text-align: center;
-        padding-bottom: 20px;
-        border-bottom: 1px solid #eaeaea;
-      }
-      .header h2 {
-        color: #333333;
-      }
-      .content {
-        padding: 20px 0;
-      }
-      .content p {
-        color: #555555;
-        line-height: 1.6;
-      }
-      .details {
-        background-color: #f9f9f9;
-        border-left: 4px solid #007bff;
-        padding: 15px;
-        margin: 20px 0;
-      }
-      .footer {
-        font-size: 13px;
-        text-align: center;
-        color: #999999;
-        margin-top: 20px;
-      }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome Delivery Man</title>
   </head>
-  <body>
-    <div class="container">
-      <div class="header">
-        <h2>Welcome, {{name}}!</h2>
-      </div>
-      <div class="content">
-        <p>
-          Congratulations! You've been registered as a
-          <strong>Delivery Man</strong> for the shop
-          <strong>{{shopName}}</strong>.
-        </p>
-        <p>Please find your login credentials below:</p>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #ffffff;
+    "
+  >
+    <table
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      border="0"
+      style="background-color: #ffffff; padding: 20px"
+    >
+      <tr>
+        <td align="center">
+          <table
+            width="600"
+            cellpadding="0"
+            cellspacing="0"
+            border="0"
+            style="
+              background-color: #ffffff;
+              border: 1px solid #e5e5e5;
+              border-radius: 8px;
+              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+              position: relative;
+              overflow: hidden;
+            "
+          >
+            <!-- Email Content -->
+            <tr>
+              <td style="position: relative; text-align: center">
+                <div style="z-index: 1; position: relative; padding: 20px">
+                  <!-- Header -->
+                  <table
+                    width="100%"
+                    cellpadding="0"
+                    cellspacing="0"
+                    border="0"
+                  >
+                    <tr>
+                      <td
+                        align="center"
+                        style="
+                          background-color: #ff4d4d;
+                          color: #ffffff;
+                          padding: 20px;
+                          border-top-left-radius: 8px;
+                          border-top-right-radius: 8px;
+                          font-size: 24px;
+                        "
+                      >
+                        <strong>Welcome to Mahlzy!</strong>
+                      </td>
+                    </tr>
+                  </table>
 
-        <div class="details">
-          <p><strong>Email:</strong> {{email}}</p>
-          <p><strong>Temporary Password:</strong> {{password}}</p>
-          <p><strong>Role:</strong> Delivery Man</p>
-        </div>
+                  <!-- Body -->
+                  <table
+                    width="100%"
+                    cellpadding="0"
+                    cellspacing="0"
+                    border="0"
+                    style="padding: 20px"
+                  >
+                    <tr>
+                      <td
+                        style="
+                          color: #333333;
+                          font-size: 16px;
+                          line-height: 1.6;
+                          text-align: left;
+                        "
+                      >
+                        <h2 style="color: #ff4d4d">Hello {{name}},</h2>
+                        <p>
+                          Congratulations! You have been successfully registered
+                          as a <strong>Delivery Man</strong> for the shop
+                          <strong>{{shopName}}</strong>.
+                        </p>
+                        <p>Please find your login credentials below:</p>
 
-        <p>
-          We recommend logging in and updating your password immediately to
-          ensure the security of your account.
-        </p>
+                        <div
+                          style="
+                            background-color: #f9f9f9;
 
-        <p>
-          If you have any questions or need assistance, feel free to reach out
-          to our support team.
-        </p>
-      </div>
-      <div class="footer">
-        &copy; 2025 Mahlzy. All rights reserved.
-      </div>
-    </div>
+                            padding: 15px;
+                            margin: 20px 0;
+                          "
+                        >
+                          <p><strong>Email:</strong> {{email}}</p>
+                          <p>
+                            <strong>Temporary Password:</strong> {{password}}
+                          </p>
+                          <p><strong>Role:</strong> Delivery Man</p>
+                        </div>
+
+                        <p>
+                          We recommend logging in and updating your password
+                          immediately to ensure the security of your account.
+                        </p>
+                        <p>
+                          If you have any questions or need assistance, feel
+                          free to reach out to our support team.
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+
+                  <!-- Footer -->
+                  <table
+                    width="100%"
+                    cellpadding="0"
+                    cellspacing="0"
+                    border="0"
+                    style="
+                      background-color: #f9f9f9;
+                      padding: 15px;
+                      border-top: 1px solid #e5e5e5;
+                    "
+                  >
+                    <tr>
+                      <td
+                        align="center"
+                        style="
+                          font-size: 12px;
+                          color: #777777;
+                          text-align: center;
+                        "
+                      >
+                        <p>
+                          Need help?
+                          <a
+                            href="mailto:support@mahlzy.com"
+                            style="color: #ff4d4d"
+                            >Contact Support</a
+                          >
+                        </p>
+                        <p>&copy; 2025 Mahlzy. All rights reserved.</p>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
   </body>
 </html>
