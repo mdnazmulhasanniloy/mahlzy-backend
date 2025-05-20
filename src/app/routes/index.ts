@@ -4,6 +4,11 @@ import { userRoutes } from '../modules/user/user.route';
 import { authRoutes } from '../modules/auth/auth.route';
 import { notificationRoutes } from '../modules/notification/notificaiton.route';
 import { contentsRoutes } from '../modules/contents/contents.route';
+import { requestVendorRoutes } from '../modules/requestVendor/requestVendor.route';
+import { categoryRoutes } from '../modules/category/category.route';
+import { cuisinesRoutes } from '../modules/cuisines/cuisines.route';
+import { shopWiseCuisinesRoutes } from '../modules/shopWiseCuisines/shopWiseCuisines.route';
+import { deliveryManRoutes } from '../modules/deliveryMan/deliveryMan.route';
 
 const router = Router();
 const moduleRoutes = [
@@ -26,6 +31,26 @@ const moduleRoutes = [
   {
     path: '/contents',
     route: contentsRoutes,
+  },
+  {
+    path: '/request-for-resturent',
+    route: requestVendorRoutes,
+  },
+  {
+    path: '/categories',
+    route: categoryRoutes,
+  },
+  {
+    path: '/cuisines',
+    route: cuisinesRoutes,
+  },
+  {
+    path: '/shop-cuisines',
+    route: shopWiseCuisinesRoutes,
+  },
+  {
+    path: '/delivery-man',
+    route: deliveryManRoutes,
   },
 ];
 moduleRoutes.forEach(route => router.use(route.path, route.route));
