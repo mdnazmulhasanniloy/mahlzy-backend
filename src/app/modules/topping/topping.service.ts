@@ -4,6 +4,7 @@ import { ITopping } from './topping.interface';
 import Topping from './topping.models';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/AppError';
+import { uploadToS3 } from '../../utils/s3';
 
 const createTopping = async (payload: ITopping, file:any ) => {
    if (file) {

@@ -1,4 +1,3 @@
-
 import { Router } from 'express';
 import { toppingController } from './topping.controller';
 import auth from '../../middleware/auth';
@@ -10,11 +9,30 @@ const router = Router();
 const storage = memoryStorage();
 const upload = multer({ storage });
 
-
-router.post('/', auth(USER_ROLE.restaurant),upload.single("image"), parseData(), toppingController.createTopping);
-router.patch('/:id', auth(USER_ROLE.restaurant, USER_ROLE.admin),upload.single("image"), parseData() toppingController.updateTopping);
-router.delete('/:id',auth(USER_ROLE.restaurant, USER_ROLE.admin), toppingController.deleteTopping);
-router.get('/my-tooping', auth(USER_ROLE.restaurant), toppingController.getMyTopping);
+router.post(
+  '/',
+  auth(USER_ROLE.restaurant),
+  upload.single('image'),
+  parseData(),
+  toppingController.createTopping,
+);
+router.patch(
+  '/:id',
+  auth(USER_ROLE.restaurant, USER_ROLE.admin),
+  upload.single('image'),
+  parseData(),
+  toppingController.updateTopping,
+);
+router.delete(
+  '/:id',
+  auth(USER_ROLE.restaurant, USER_ROLE.admin),
+  toppingController.deleteTopping,
+);
+router.get(
+  '/my-toppings',
+  auth(USER_ROLE.restaurant),
+  toppingController.getMyTopping,
+);
 router.get('/resturant/:userId', toppingController.getShopTopping);
 router.get('/:id', toppingController.getToppingById);
 router.get('/', toppingController.getAllTopping);

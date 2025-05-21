@@ -9,6 +9,7 @@ import { categoryRoutes } from '../modules/category/category.route';
 import { cuisinesRoutes } from '../modules/cuisines/cuisines.route';
 import { shopWiseCuisinesRoutes } from '../modules/shopWiseCuisines/shopWiseCuisines.route';
 import { deliveryManRoutes } from '../modules/deliveryMan/deliveryMan.route';
+import { toppingRoutes } from '../modules/topping/topping.route';
 
 const router = Router();
 const moduleRoutes = [
@@ -33,7 +34,7 @@ const moduleRoutes = [
     route: contentsRoutes,
   },
   {
-    path: '/request-for-resturent',
+    path: '/request-for-resturant',
     route: requestVendorRoutes,
   },
   {
@@ -51,6 +52,14 @@ const moduleRoutes = [
   {
     path: '/delivery-man',
     route: deliveryManRoutes,
+  },
+  {
+    path: '/delivery-man',
+    route: deliveryManRoutes,
+  },
+  {
+    path: '/toppings',
+    route: toppingRoutes,
   },
 ];
 moduleRoutes.forEach(route => router.use(route.path, route.route));

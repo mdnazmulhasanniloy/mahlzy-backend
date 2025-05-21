@@ -1,9 +1,8 @@
-
-import { model, Schema } from 'mongoose';
+import { model, Schema, Types } from 'mongoose';
 import { ITopping, IToppingModules } from './topping.interface';
 
 const toppingSchema = new Schema<ITopping>(
- {
+  {
     name: {
       type: String,
       required: true,
@@ -30,16 +29,12 @@ const toppingSchema = new Schema<ITopping>(
       type: String,
       required: true,
     },
-    isDeleted: { type: Boolean, default: false },  
+    isDeleted: { type: Boolean, default: false },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
-
-const Topping = model<ITopping, IToppingModules>(
-  'Topping',
-  toppingSchema
-);
+const Topping = model<ITopping, IToppingModules>('Topping', toppingSchema);
 export default Topping;

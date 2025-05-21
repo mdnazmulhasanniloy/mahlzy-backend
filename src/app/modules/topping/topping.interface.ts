@@ -1,5 +1,4 @@
-
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 
 export interface ITopping {
   name: string;
