@@ -5,7 +5,10 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/AppError';
 import { deleteManyFromS3, uploadManyToS3 } from '../../utils/s3';
 import { UploadedFiles } from '../../interface/common.interface';
-import { User } from '../user/user.models'; 
+import { User } from '../user/user.models';
+import pickQuery from '../../utils/pickQuery';
+import { Types } from 'mongoose';
+import { paginationHelper } from '../../helpers/pagination.helpers';
 const createProducts = async (payload: IProducts, files: any) => {
   const author = await User.findById(payload.author);
   if (!author || !author?.shop || author?.isDeleted) {
@@ -58,6 +61,213 @@ const getAllProducts = async (query: Record<string, any>) => {
   };
 };
 
+const getAllApartment = async (query: Record<string, any>) => {
+  const { filters, pagination } = await pickQuery(query);
+
+  const { searchTerm, priceRange, ratingsFilter, toppings, ...filtersData } =
+    filters;
+
+  if (filtersData?.author) {
+    filtersData['author'] = new Types.ObjectId(filtersData?.author);
+  }
+
+  if (filtersData?.shop) {
+    filtersData['shop'] = new Types.ObjectId(filtersData?.shop);
+  }
+
+  if (filtersData?.category) {
+    filtersData['category'] = new Types.ObjectId(filtersData?.category);
+  }
+  // if (filtersData?.toppings) {
+  //   filtersData['toppings'] = new Types.ObjectId(filtersData?.toppings);
+  // }
+
+  // Initialize the aggregation pipeline
+  const pipeline: any[] = [];
+
+  // If latitude and longitude are provided, add $geoNear to the aggregation pipeline
+  // if (latitude && longitude) {
+  //   pipeline.push({
+  //     $geoNear: {
+  //       near: {
+  //         type: 'Point',
+  //         coordinates: [parseFloat(longitude), parseFloat(latitude)],
+  //       },
+  //       key: 'location',
+  //       maxDistance: parseFloat(5 as unknown as string) * 1609, // 5 miles to meters
+  //       distanceField: 'dist.calculated',
+  //       spherical: true,
+  //     },
+  //   });
+  // }
+
+  // Add a match to exclude deleted documents
+  pipeline.push({
+    $match: {
+      isDeleted: false,
+    },
+  });
+
+  // If searchTerm is provided, add a search condition
+  if (searchTerm) {
+    pipeline.push({
+      $match: {
+        $or: ['name', 'Other'].map(field => ({
+          [field]: {
+            $regex: searchTerm,
+            $options: 'i',
+          },
+        })),
+      },
+    });
+  }
+
+  if (priceRange) {
+    const [low, high] = priceRange.split('-').map(Number);
+
+    pipeline.push({
+      $match: {
+        price: { $gte: low, $lte: high },
+      },
+    });
+  }
+
+  if (ratingsFilter) {
+    const ratingsArray = ratingsFilter?.split(',').map(Number);
+    pipeline.push({
+      $match: {
+        avgRating: { $in: ratingsArray },
+      },
+    });
+  }
+
+  if (toppings) {
+    const toppingsArray = toppings
+      ?.split(',')
+      .map((facility: string) => new Types.ObjectId(facility));
+    pipeline.push({
+      $match: {
+        toppings: { $in: toppingsArray },
+      },
+    });
+  }
+
+  if (Object.entries(filtersData).length) {
+    // Add custom filters (filtersData) to the aggregation pipeline
+    Object.entries(filtersData).map(([field, value]) => {
+      if (/^\[.*?\]$/.test(value)) {
+        const match = value.match(/\[(.*?)\]/);
+        const queryValue = match ? match[1] : value;
+        pipeline.push({
+          $match: {
+            [field]: { $in: [new Types.ObjectId(queryValue)] },
+          },
+        });
+        delete filtersData[field];
+      }
+    });
+
+    if (Object.entries(filtersData).length) {
+      pipeline.push({
+        $match: {
+          $and: Object.entries(filtersData).map(([field, value]) => ({
+            isDeleted: false,
+            [field]: value,
+          })),
+        },
+      });
+    }
+  }
+
+  // Sorting condition
+  const { page, limit, skip, sort } =
+    paginationHelper.calculatePagination(pagination);
+
+  if (sort) {
+    const sortArray = sort.split(',').map(field => {
+      const trimmedField = field.trim();
+      if (trimmedField.startsWith('-')) {
+        return { [trimmedField.slice(1)]: -1 };
+      }
+      return { [trimmedField]: 1 };
+    });
+
+    pipeline.push({ $sort: Object.assign({}, ...sortArray) });
+  }
+
+  pipeline.push({
+    $facet: {
+      totalData: [{ $count: 'total' }],
+      paginatedData: [
+        { $skip: skip },
+        { $limit: limit },
+        // Lookups
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'author',
+            foreignField: '_id',
+            as: 'author',
+            pipeline: [
+              {
+                $project: {
+                  name: 1,
+                  email: 1,
+                  phoneNumber: 1,
+                  profile: 1,
+                },
+              },
+            ],
+          },
+        },
+        {
+          $lookup: {
+            from: 'shop',
+            localField: 'shop',
+            foreignField: '_id',
+            as: 'shop',
+          },
+        },
+
+        {
+          $lookup: {
+            from: 'toppings',
+            localField: 'toppings',
+            foreignField: '_id',
+            as: 'toppings',
+          },
+        },
+        // {
+        //   $lookup: {
+        //     from: 'reviews',
+        //     localField: 'reviews',
+        //     foreignField: '_id',
+        //     as: 'reviews',
+        //   },
+        // },
+
+        {
+          $addFields: {
+            author: { $arrayElemAt: ['$author', 0] },
+            shop: { $arrayElemAt: ['$shop', 0] },
+            // facility: { $arrayElemAt: ['$facility', 0] },
+            // ratings: { $arrayElemAt: ['$ratings', 0] },
+          },
+        },
+      ],
+    },
+  });
+
+  const [result] = await Products.aggregate(pipeline);
+
+  const total = result?.totalData?.[0]?.total || 0;
+  const data = result?.paginatedData || [];
+
+  return {
+    meta: { page, limit, total },
+    data,
+  };
+};
 const getProductsById = async (id: string) => {
   const result = await Products.findById(id);
   if (!result || result?.isDeleted) {
