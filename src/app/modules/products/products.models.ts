@@ -15,7 +15,6 @@ const productsSchema = new Schema<IProducts>(
     shortDescriptions: {
       type: String,
       required: [true, 'Short description is required'],
-      // maxlength: [250, "Short description must not exceed 250 characters"],
     },
     descriptions: {
       type: String,
@@ -26,9 +25,14 @@ const productsSchema = new Schema<IProducts>(
       ref: 'User',
       required: [true, 'Author is required'],
     },
+    shop: {
+      type: Types.ObjectId,
+      ref: 'Shop',
+      required: [true, 'Shop is required'],
+    },
     category: {
       type: Types.ObjectId,
-      ref: 'Category',
+      ref: 'Categories',
       required: [true, 'Category is required'],
     },
     spiceLevel: {
@@ -66,10 +70,9 @@ const productsSchema = new Schema<IProducts>(
       type: [
         {
           url: { type: String, required: [true, 'Image URL is required'] },
-          alt: { type: String, required: [true, 'Image alt text is required'] },
+          key: { type: String, required: [true, 'Image key is required'] },
         },
       ],
-      required: [true, 'At least one image is required'],
     },
     totalReview: {
       type: Number,
@@ -83,12 +86,8 @@ const productsSchema = new Schema<IProducts>(
       max: [5, 'Average rating cannot exceed 5'],
     },
     totalSell: {
-      type: String,
-      default: '0',
-      validate: {
-        validator: value => !isNaN(Number(value)),
-        message: 'Total sell must be a valid number',
-      },
+      type: Number,
+      default: 0, 
     },
     isDeleted: {
       type: Boolean,

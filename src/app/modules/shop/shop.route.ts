@@ -2,24 +2,41 @@ import { Router } from 'express';
 import { shopController } from './shop.controller';
 import auth from '../../middleware/auth';
 import { USER_ROLE } from '../user/user.constants';
+import multer, { memoryStorage } from 'multer';
+import { uploadManyToS3 } from './../../utils/s3';
+import parseData from '../../middleware/parseData';
 
 const router = Router();
+const storage = memoryStorage();
+const upload = multer({ storage });
 
 // router.post('/', shopController.createShop);
+
 router.patch(
-  '/update-my-shop',
-  auth(USER_ROLE.admin),
+  '/my-shop',
+  auth(USER_ROLE.restaurant),
+  upload.single('banner'),
+  parseData(),
   shopController.updateMyShop,
 );
-router.patch('/:id', auth(USER_ROLE.admin), shopController.updateShop);
+
+router.patch(
+  '/:id',
+  auth(USER_ROLE.admin),
+  upload.single('banner'),
+  parseData(),
+  shopController.updateShop,
+);
+
 router.delete(
   '/:id',
   auth(USER_ROLE.admin, USER_ROLE.restaurant),
   shopController.deleteShop,
 );
+
 router.get(
   '/my-shop',
-  auth(USER_ROLE.admin, USER_ROLE.restaurant),
+  auth(USER_ROLE.restaurant),
   shopController.getMyShop,
 );
 router.get('/:id', shopController.getShopById);

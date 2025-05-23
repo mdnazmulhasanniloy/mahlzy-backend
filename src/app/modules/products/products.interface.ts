@@ -1,30 +1,28 @@
+import { Model, ObjectId } from 'mongoose';
 
-import { Model } from 'mongoose';
-
-
-interface IImages{
-    key:string;
-    url:string
+interface IImages {
+  key: string;
+  url: string;
 }
 export interface IProducts {
-
- _id: string;  
+  deleteKey: string[];
+  _id: string;
   name: string;
   price: number;
   shortDescriptions: string;
   descriptions: string;
-  author: ObjectId
+  author: ObjectId;
+  shop: ObjectId;
   category: ObjectId;
-  spiceLevel: string
-  sauceLevel: string
-  toppings: ObjectId[]; 
+  spiceLevel: string;
+  sauceLevel: string;
+  toppings: ObjectId[];
   discount: number;
   images: IImages[];
-  totalReview:number;
-  avgRatings:number;
-  totalSell:string;
-  isDeleted:boolian
+  totalReview: number;
+  avgRatings: number;
+  totalSell: number;
+  isDeleted: boolean;
 }
 
- 
 export type IProductsModules = Model<IProducts, Record<string, unknown>>;

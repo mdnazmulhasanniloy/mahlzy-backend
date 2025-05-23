@@ -13,10 +13,9 @@ const createDocuments = async (payload: IDocuments) => {
   return result;
 };
 
-const getAllDocuments = async (query: Record<string, any>) => {
-query["isDeleted"] = false;
+const getAllDocuments = async (query: Record<string, any>) => { 
   const documentsModel = new QueryBuilder(Documents.find(), query)
-    .search([])
+    .search([""])
     .filter()
     .paginate()
     .sort()
@@ -33,7 +32,7 @@ query["isDeleted"] = false;
 
 const getDocumentsById = async (id: string) => {
   const result = await Documents.findById(id);
-  if (!result && result?.isDeleted) {
+  if (!result) {
     throw new Error('Documents not found!');
   }
   return result;

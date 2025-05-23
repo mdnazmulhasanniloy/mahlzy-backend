@@ -25,7 +25,7 @@ const getAllShop = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getMyShop = catchAsync(async (req: Request, res: Response) => {
-  const result = await shopService.getMyShop(req.params.id);
+  const result = await shopService.getMyShop(req?.user?.userId);
   sendResponse(res, {
     statusCode: 200,
     success: true,
@@ -35,7 +35,7 @@ const getMyShop = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getShopById = catchAsync(async (req: Request, res: Response) => {
-  const result = await shopService.getShopById(req?.user?.userId);
+  const result = await shopService.getShopById(req.params.id);
   sendResponse(res, {
     statusCode: 200,
     success: true,
