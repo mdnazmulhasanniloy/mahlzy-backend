@@ -11,6 +11,7 @@ import { shopWiseCuisinesRoutes } from '../modules/shopWiseCuisines/shopWiseCuis
 import { deliveryManRoutes } from '../modules/deliveryMan/deliveryMan.route';
 import { toppingRoutes } from '../modules/topping/topping.route';
 import { couponCodeRoutes } from '../modules/couponCode/couponCode.route';
+import { productsRoutes } from '../modules/products/products.route';
 
 const router = Router();
 const moduleRoutes = [
@@ -65,6 +66,10 @@ const moduleRoutes = [
   {
     path: '/coupon-codes',
     route: couponCodeRoutes,
+  },
+  {
+    path: '/products',
+    route: productsRoutes,
   },
 ];
 moduleRoutes.forEach(route => router.use(route.path, route.route));

@@ -7,6 +7,7 @@ interface IImages {
 export interface IProducts {
   deleteKey: string[];
   _id: string;
+  id: string;
   name: string;
   price: number;
   shortDescriptions: string;
@@ -25,4 +26,7 @@ export interface IProducts {
   isDeleted: boolean;
 }
 
-export type IProductsModules = Model<IProducts, Record<string, unknown>>;
+export interface IProductsModules
+  extends Model<IProducts, Record<string, unknown>> {
+  findByProductId(id: string): Promise<IProducts>;
+}

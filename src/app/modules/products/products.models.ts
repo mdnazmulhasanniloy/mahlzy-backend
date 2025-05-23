@@ -1,8 +1,13 @@
 import { model, Schema, Types } from 'mongoose';
 import { IProducts, IProductsModules } from './products.interface';
+import generateCryptoString from '../../utils/generateCryptoString';
 
 const productsSchema = new Schema<IProducts>(
   {
+    id: {
+      type: String,
+      default: () => generateCryptoString(8),
+    },
     name: {
       type: String,
       required: [true, 'Product name is required'],
@@ -87,7 +92,7 @@ const productsSchema = new Schema<IProducts>(
     },
     totalSell: {
       type: Number,
-      default: 0, 
+      default: 0,
     },
     isDeleted: {
       type: Boolean,
@@ -99,5 +104,8 @@ const productsSchema = new Schema<IProducts>(
   },
 );
 
+productsSchema.statics.findByProductId = async function (id: string) {
+  return await this.findOne({ id });
+};
 const Products = model<IProducts, IProductsModules>('Products', productsSchema);
 export default Products;

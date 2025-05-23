@@ -41,27 +41,27 @@ const createProducts = async (payload: IProducts, files: any) => {
   return result;
 };
 
+// const getAllProducts = async (query: Record<string, any>) => {
+//   const productsModel = new QueryBuilder(
+//     Products.find({ isDeleted: false }),
+//     query,
+//   )
+//     .search(['name', 'shortDescriptions', 'descriptions'])
+//     .filter()
+//     .paginate()
+//     .sort()
+//     .fields();
+
+//   const data = await productsModel.modelQuery;
+//   const meta = await productsModel.countTotal();
+
+//   return {
+//     data,
+//     meta,
+//   };
+// };
+
 const getAllProducts = async (query: Record<string, any>) => {
-  const productsModel = new QueryBuilder(
-    Products.find({ isDeleted: false }),
-    query,
-  )
-    .search(['name', 'shortDescriptions', 'descriptions'])
-    .filter()
-    .paginate()
-    .sort()
-    .fields();
-
-  const data = await productsModel.modelQuery;
-  const meta = await productsModel.countTotal();
-
-  return {
-    data,
-    meta,
-  };
-};
-
-const getAllApartment = async (query: Record<string, any>) => {
   const { filters, pagination } = await pickQuery(query);
 
   const { searchTerm, priceRange, ratingsFilter, toppings, ...filtersData } =
@@ -112,7 +112,7 @@ const getAllApartment = async (query: Record<string, any>) => {
   if (searchTerm) {
     pipeline.push({
       $match: {
-        $or: ['name', 'Other'].map(field => ({
+        $or: ['name', 'id'].map(field => ({
           [field]: {
             $regex: searchTerm,
             $options: 'i',
