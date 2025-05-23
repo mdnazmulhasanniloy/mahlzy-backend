@@ -24,6 +24,7 @@ export interface IUser {
   needsPasswordChange: boolean;
   passwordChangedAt?: Date;
   isDeleted: boolean;
+  expireAt: Date;
   loginWth: 'google' | 'apple' | 'facebook' | 'credentials';
   verification: {
     otp: string | number;

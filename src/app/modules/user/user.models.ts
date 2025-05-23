@@ -81,7 +81,15 @@ const userSchema: Schema<IUser> = new Schema(
     passwordChangedAt: {
       type: Date,
     },
+    expireAt: {
+      type: Date,
+      default: () => {
+        const expireAt = new Date();
 
+        // return expireAt.setHours(expireAt.getHours() + 48);
+        return expireAt.setMinutes(expireAt.getMinutes() + 20);
+      },
+    },
     isDeleted: {
       type: Boolean,
       default: false,
@@ -127,6 +135,8 @@ const userSchema: Schema<IUser> = new Schema(
     timestamps: true,
   },
 );
+
+userSchema.index({ expireAt: 1 }, { expireAfterSeconds: 0 });
 
 userSchema.pre('save', async function (next) {
   // eslint-disable-next-line @typescript-eslint/no-this-alias

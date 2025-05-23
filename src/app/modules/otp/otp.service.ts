@@ -48,6 +48,7 @@ const verifyOtp = async (token: string, otp: string | number) => {
     user?._id,
     {
       $set: {
+        expireAt: null,
         verification: {
           otp: 0,
           expiresAt: moment().add(3, 'minute'),
@@ -109,20 +110,19 @@ const resendOtp = async (email: string) => {
     expiresIn: '3m',
   });
 
-    const otpEmailPath = path.join(
-      __dirname,
-      '../../../../public/view/otp_mail.html',
-    );
+  const otpEmailPath = path.join(
+    __dirname,
+    '../../../../public/view/otp_mail.html',
+  );
 
-    await sendEmail(
-      user?.email,
-      'Your One Time OTP',
-      fs
-        .readFileSync(otpEmailPath, 'utf8')
-        .replace('{{otp}}', otp)
-        .replace('{{email}}', user?.email),
-    );
-
+  await sendEmail(
+    user?.email,
+    'Your One Time OTP',
+    fs
+      .readFileSync(otpEmailPath, 'utf8')
+      .replace('{{otp}}', otp)
+      .replace('{{email}}', user?.email),
+  );
 
   // await sendEmail(
   //   user?.email,

@@ -13,4 +13,4 @@ export interface ICouponCode {
 export interface ICouponCodeModules
   extends Model<ICouponCode, Record<string, unknown>> {
   findByCode(code: string): Promise<ICouponCode>;
-};
+}

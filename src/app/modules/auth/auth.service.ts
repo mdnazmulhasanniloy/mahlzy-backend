@@ -24,7 +24,7 @@ import { Login_With, USER_ROLE } from '../user/user.constants';
 import { Request } from 'express';
 
 // Login
-const login = async (payload: TLogin, req:Request) => {
+const login = async (payload: TLogin, req: Request) => {
   const user: IUser | null = await User.isUserExist(payload?.email);
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found');
@@ -58,7 +58,6 @@ const login = async (payload: TLogin, req:Request) => {
     config.jwt_refresh_expires_in as string,
   );
 
-
   const ip =
     req.headers['x-forwarded-for']?.toString().split(',')[0] ||
     req.socket.remoteAddress ||
@@ -82,7 +81,6 @@ const login = async (payload: TLogin, req:Request) => {
     new: true,
     upsert: false,
   });
-
 
   return {
     user,
@@ -357,6 +355,7 @@ const googleLogin = async (payload: any, req: Request) => {
       name: decodedToken?.name,
       email: decodedToken?.email,
       profile: decodedToken?.picture,
+      expireAt: null,
       phoneNumber: decodedToken?.phone_number,
       role: payload?.role ?? USER_ROLE.user,
       loginWth: Login_With.google,

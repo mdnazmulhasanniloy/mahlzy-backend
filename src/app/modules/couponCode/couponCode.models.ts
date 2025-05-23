@@ -1,11 +1,11 @@
-import { model, Schema, Types } from 'mongoose';
+import { model, Schema } from 'mongoose';
 import { ICouponCode, ICouponCodeModules } from './couponCode.interface';
 import generateCryptoString from '../../utils/generateCryptoString';
 
 const couponCodeSchema = new Schema<ICouponCode>(
   {
     resturant: {
-      types: Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'User',
     },
     code: {

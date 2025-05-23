@@ -10,6 +10,7 @@ import { cuisinesRoutes } from '../modules/cuisines/cuisines.route';
 import { shopWiseCuisinesRoutes } from '../modules/shopWiseCuisines/shopWiseCuisines.route';
 import { deliveryManRoutes } from '../modules/deliveryMan/deliveryMan.route';
 import { toppingRoutes } from '../modules/topping/topping.route';
+import { couponCodeRoutes } from '../modules/couponCode/couponCode.route';
 
 const router = Router();
 const moduleRoutes = [
@@ -60,6 +61,10 @@ const moduleRoutes = [
   {
     path: '/toppings',
     route: toppingRoutes,
+  },
+  {
+    path: '/coupon-codes',
+    route: couponCodeRoutes,
   },
 ];
 moduleRoutes.forEach(route => router.use(route.path, route.route));
