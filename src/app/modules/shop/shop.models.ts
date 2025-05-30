@@ -27,7 +27,10 @@ const shopSchema = new Schema<IShop>(
       required: [true, 'Phone number is required'],
       unique: true,
     },
-
+    deliveryFee:{
+      type: Number,
+      default:0
+    },
     shopName: {
       type: String,
       required: [true, 'Name is required'],

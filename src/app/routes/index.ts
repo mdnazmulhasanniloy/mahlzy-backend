@@ -12,6 +12,7 @@ import { deliveryManRoutes } from '../modules/deliveryMan/deliveryMan.route';
 import { toppingRoutes } from '../modules/topping/topping.route';
 import { couponCodeRoutes } from '../modules/couponCode/couponCode.route';
 import { productsRoutes } from '../modules/products/products.route';
+import { ordersRoutes } from '../modules/orders/orders.route';
 
 const router = Router();
 const moduleRoutes = [
@@ -70,6 +71,10 @@ const moduleRoutes = [
   {
     path: '/products',
     route: productsRoutes,
+  },
+  {
+    path: '/orders',
+    route: ordersRoutes,
   },
 ];
 moduleRoutes.forEach(route => router.use(route.path, route.route));

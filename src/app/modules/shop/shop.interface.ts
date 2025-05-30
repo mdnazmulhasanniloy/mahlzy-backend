@@ -5,7 +5,7 @@ export interface ILocation {
   coordinates: [number, number];
 }
 export interface IOpeningTime {
-  _id:string
+  _id: string;
   day: string;
   openTime: string;
   closeTime: string;
@@ -15,6 +15,7 @@ export interface IShop {
   id: string;
   author: ObjectId;
   shopMail: string;
+  deliveryFee: number;
   shopPhoneNumber: string;
   shopName: string;
   banner: string;

@@ -4,9 +4,10 @@ import { ITopping } from '../topping/topping.interface';
 import { IProducts } from '../products/products.interface';
 
 export interface IOrders {
+  createdAt: Date;
   id: string;
-  user: ObjectId;
-  author: ObjectId;
+  user: ObjectId | IUser;
+  author: ObjectId | IUser;
   totalPrice: number;
   coupon: string;
   status: string;

@@ -6,7 +6,7 @@ const ordersSchema = new Schema<IOrders>(
   {
     id: {
       type: String,
-      default: () => generateCryptoString(10),
+      default: () => `ORDER-${generateCryptoString(10)}`,
     },
     user: {
       type: Schema.Types.ObjectId,
@@ -84,7 +84,6 @@ const ordersSchema = new Schema<IOrders>(
     deliveryMan: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
     },
     deliveryLocation: {
       type: {
