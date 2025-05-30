@@ -1,15 +1,19 @@
 import { Model, ObjectId } from 'mongoose';
+import { IUser } from '../user/user.interface';
+import { IOrders } from '../orders/orders.interface';
 
 export interface IPayments {
+  _id: string;
   id: string;
-  user: ObjectId;
-  author: ObjectId;
-  order: ObjectId;
+  user: ObjectId | IUser;
+  author: ObjectId | IUser;
+  order: ObjectId | IOrders;
   amount: Number;
   status: 'paid' | 'pending' | 'cancel' | 'refound';
   isTransfer: boolean;
   tranId: string;
-  chId: string;
+  paymentIntentId: string;
+  adminAmount: number;
   transferAt: Date;
   isDeleted: boolean;
 }

@@ -18,6 +18,7 @@ export interface IUser {
   gender: 'Male' | 'Female' | 'Others';
   location: ILocation;
   profile: string;
+  customerId: string;
   role: string;
   isGoogleLogin: boolean;
   address?: string;
@@ -25,6 +26,7 @@ export interface IUser {
   passwordChangedAt?: Date;
   isDeleted: boolean;
   expireAt: Date;
+  orderCharge: number;
   loginWth: 'google' | 'apple' | 'facebook' | 'credentials';
   verification: {
     otp: string | number;

@@ -19,6 +19,9 @@ const paymentsSchema = new Schema<IPayments>(
       ref: 'User',
       required: true,
     },
+    adminAmount: {
+      type: Number,
+    },
     order: {
       type: Types.ObjectId,
       ref: 'Orders',
@@ -35,7 +38,7 @@ const paymentsSchema = new Schema<IPayments>(
     },
     isTransfer: { type: Boolean, default: false },
     tranId: { type: String, default: null },
-    chId: { type: String, default: null },
+    paymentIntentId: { type: String, default: null },
     transferAt: { type: Date, default: null },
     isDeleted: { type: Boolean, default: false },
   },

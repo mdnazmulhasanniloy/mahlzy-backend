@@ -38,6 +38,9 @@ const userSchema: Schema<IUser> = new Schema(
       required: true,
       default: null,
     },
+    orderCharge: {
+      type: Number,
+    },
 
     password: {
       type: String,
@@ -64,6 +67,9 @@ const userSchema: Schema<IUser> = new Schema(
     address: {
       type: String,
       default: null,
+    },
+    customerId: {
+      type: String, 
     },
 
     location: {
