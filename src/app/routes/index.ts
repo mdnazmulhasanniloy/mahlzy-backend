@@ -13,6 +13,8 @@ import { toppingRoutes } from '../modules/topping/topping.route';
 import { couponCodeRoutes } from '../modules/couponCode/couponCode.route';
 import { productsRoutes } from '../modules/products/products.route';
 import { ordersRoutes } from '../modules/orders/orders.route';
+import stripeRoute from '../modules/stripe/stripe.route';
+import { paymentsRoutes } from '../modules/payments/payments.route';
 
 const router = Router();
 const moduleRoutes = [
@@ -75,6 +77,14 @@ const moduleRoutes = [
   {
     path: '/orders',
     route: ordersRoutes,
+  },
+  {
+    path: '/stripe',
+    route: stripeRoute,
+  },
+  {
+    path: '/payments',
+    route: paymentsRoutes,
   },
 ];
 moduleRoutes.forEach(route => router.use(route.path, route.route));
