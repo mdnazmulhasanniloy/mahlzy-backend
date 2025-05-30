@@ -7,6 +7,9 @@ import { Server } from 'socket.io';
 import httpStatus from 'http-status';
 import AppError from './app/error/AppError';
 import getUserDetailsFromToken from './app/helpers/getUserDetailsFromToken';
+import callbackFn from './app/utils/callbackFn';
+import { User } from './app/modules/user/user.models';
+import DeliveryMan from './app/modules/deliveryMan/deliveryMan.models';
 
 const initializeSocketIO = (server: HttpServer) => {
   const io = new Server(server, {
@@ -41,6 +44,18 @@ const initializeSocketIO = (server: HttpServer) => {
         callback({ success: true });
       });
 
+      socket.on('update-my-Location', async (data, callback) => {
+        if (!data?.location) {
+          callbackFn(callback, {
+            success: false,
+            message: 'location is required',
+          });
+        }
+
+        const deliveryMan = await DeliveryMan.findByIdAndUpdate(user._id, {
+          lastLocation: data.location,
+        });
+      });
       //-----------------------Disconnect------------------------//
       socket.on('disconnect', () => {
         onlineUser.delete(user?._id?.toString());
