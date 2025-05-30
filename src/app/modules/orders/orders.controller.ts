@@ -2,9 +2,7 @@
 import { Request, Response } from 'express';
 import catchAsync from '../../utils/catchAsync';  
 import { ordersService } from './orders.service';
-import sendResponse from '../../utils/sendResponse';
-import { storeFile } from '../../utils/fileHelper';
-import { uploadToS3 } from '../../utils/s3';
+import sendResponse from '../../utils/sendResponse'; 
 
 const createOrders = catchAsync(async (req: Request, res: Response) => {
  const result = await ordersService.createOrders(req.body);
