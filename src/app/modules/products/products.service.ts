@@ -75,8 +75,8 @@ const getAllProducts = async (query: Record<string, any>) => {
     filtersData['shop'] = new Types.ObjectId(filtersData?.shop);
   }
 
-  if (filtersData?.category) {
-    filtersData['category'] = new Types.ObjectId(filtersData?.category);
+  if (filtersData?.cuisines) {
+    filtersData['cuisines'] = new Types.ObjectId(filtersData?.cuisines);
   }
   // if (filtersData?.toppings) {
   //   filtersData['toppings'] = new Types.ObjectId(filtersData?.toppings);
@@ -144,7 +144,7 @@ const getAllProducts = async (query: Record<string, any>) => {
   if (toppings) {
     const toppingsArray = toppings
       ?.split(',')
-      .map((facility: string) => new Types.ObjectId(facility));
+      .map((topping: string) => new Types.ObjectId(topping));
     pipeline.push({
       $match: {
         toppings: { $in: toppingsArray },
@@ -237,6 +237,14 @@ const getAllProducts = async (query: Record<string, any>) => {
             as: 'toppings',
           },
         },
+        {
+          $lookup: {
+            from: 'cuisines',
+            localField: 'cuisines',
+            foreignField: '_id',
+            as: 'cuisines',
+          },
+        },
         // {
         //   $lookup: {
         //     from: 'reviews',
@@ -250,6 +258,7 @@ const getAllProducts = async (query: Record<string, any>) => {
           $addFields: {
             author: { $arrayElemAt: ['$author', 0] },
             shop: { $arrayElemAt: ['$shop', 0] },
+            cuisines: { $arrayElemAt: ['$cuisines', 0] },
             // facility: { $arrayElemAt: ['$facility', 0] },
             // ratings: { $arrayElemAt: ['$ratings', 0] },
           },
@@ -268,6 +277,8 @@ const getAllProducts = async (query: Record<string, any>) => {
     data,
   };
 };
+
+
 const getProductsById = async (id: string) => {
   const result = await Products.findById(id);
   if (!result || result?.isDeleted) {
@@ -362,6 +373,7 @@ const updateProducts = async (
     );
   }
 };
+
 const deleteProducts = async (id: string) => {
   const result = await Products.findByIdAndUpdate(
     id,

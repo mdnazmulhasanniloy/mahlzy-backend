@@ -14,6 +14,9 @@ export interface IShop {
   _id: string;
   id: string;
   author: ObjectId;
+  categories: ObjectId[];
+  // deliveryCharge:number,
+
   shopMail: string;
   deliveryFee: number;
   shopPhoneNumber: string;

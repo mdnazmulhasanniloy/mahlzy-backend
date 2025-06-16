@@ -1,4 +1,4 @@
-import { model, Schema } from 'mongoose';
+import { model, Schema, Types } from 'mongoose';
 import { ICuisines, ICuisinesModules } from './cuisines.interface';
 
 const cuisinesSchema = new Schema<ICuisines>(
@@ -11,6 +11,11 @@ const cuisinesSchema = new Schema<ICuisines>(
     image: {
       type: String,
       default: null,
+    },
+    shop: {
+      type: Types.ObjectId,
+      ref: 'Shop',
+      required: true,
     },
     isDeleted: { type: Boolean, default: false },
   },

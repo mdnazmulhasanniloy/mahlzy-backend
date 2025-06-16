@@ -14,7 +14,7 @@ export interface IProducts {
   descriptions: string;
   author: ObjectId;
   shop: ObjectId;
-  category: ObjectId;
+  cuisines: ObjectId;
   spiceLevel: string;
   sauceLevel: string;
   toppings: ObjectId[];

@@ -35,10 +35,10 @@ const productsSchema = new Schema<IProducts>(
       ref: 'Shop',
       required: [true, 'Shop is required'],
     },
-    category: {
+    cuisines: {
       type: Types.ObjectId,
-      ref: 'Categories',
-      required: [true, 'Category is required'],
+      ref: 'Cuisines',
+      required: [true, 'Cuisines is required'],
     },
     spiceLevel: {
       type: String,

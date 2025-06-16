@@ -15,6 +15,13 @@ const shopSchema = new Schema<IShop>(
       ref: 'User',
       required: true,
     },
+    categories: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Categories',
+        required: true,
+      },
+    ],
     shopMail: {
       type: String,
       lowercase: true,
@@ -27,9 +34,9 @@ const shopSchema = new Schema<IShop>(
       required: [true, 'Phone number is required'],
       unique: true,
     },
-    deliveryFee:{
+    deliveryFee: {
       type: Number,
-      default:0
+      default: 0,
     },
     shopName: {
       type: String,
@@ -98,7 +105,7 @@ shopSchema.statics.isShopExistId = async function (id: string) {
   return await Shop.findById(id);
 };
 shopSchema.statics.getShopByAuthor = async function (author: string) {
-  return await Shop.findOne({author: author});
+  return await Shop.findOne({ author: author });
 };
 
 const Shop = model<IShop, IShopModules>('Shop', shopSchema);

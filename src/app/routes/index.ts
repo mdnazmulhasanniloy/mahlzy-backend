@@ -7,7 +7,6 @@ import { contentsRoutes } from '../modules/contents/contents.route';
 import { requestVendorRoutes } from '../modules/requestVendor/requestVendor.route';
 import { categoryRoutes } from '../modules/category/category.route';
 import { cuisinesRoutes } from '../modules/cuisines/cuisines.route';
-import { shopWiseCuisinesRoutes } from '../modules/shopWiseCuisines/shopWiseCuisines.route';
 import { deliveryManRoutes } from '../modules/deliveryMan/deliveryMan.route';
 import { toppingRoutes } from '../modules/topping/topping.route';
 import { couponCodeRoutes } from '../modules/couponCode/couponCode.route';
@@ -49,10 +48,6 @@ const moduleRoutes = [
   {
     path: '/cuisines',
     route: cuisinesRoutes,
-  },
-  {
-    path: '/shop-cuisines',
-    route: shopWiseCuisinesRoutes,
   },
   {
     path: '/delivery-man',

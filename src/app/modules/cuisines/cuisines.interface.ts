@@ -1,9 +1,11 @@
 import { Model, ObjectId } from 'mongoose';
+import { IShop } from '../shop/shop.interface';
 
 export interface ICuisines {
   _id: string | ObjectId;
   name: string;
   image: string;
+  shop: ObjectId | IShop;
   isDeleted: boolean;
 }
 
