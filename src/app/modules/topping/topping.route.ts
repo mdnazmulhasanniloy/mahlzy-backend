@@ -33,7 +33,7 @@ router.get(
   auth(USER_ROLE.restaurant),
   toppingController.getMyTopping,
 );
-router.get('/resturant/:userId', toppingController.getShopTopping);
+router.get('/resturant/:shopId', toppingController.getShopTopping);
 router.get('/:id', toppingController.getToppingById);
 router.get('/', toppingController.getAllTopping);
 

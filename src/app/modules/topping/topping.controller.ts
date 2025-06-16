@@ -2,6 +2,10 @@ import { Request, Response } from 'express';
 import catchAsync from '../../utils/catchAsync';
 import { toppingService } from './topping.service';
 import sendResponse from '../../utils/sendResponse';
+import { User } from '../user/user.models';
+import AppError from '../../error/AppError';
+import httpStatus from 'http-status';
+import Shop from '../shop/shop.models';
 
 const createTopping = catchAsync(async (req: Request, res: Response) => {
   req.body['author'] = req.user.userId;
@@ -34,7 +38,11 @@ const getMyTopping = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const getShopTopping = catchAsync(async (req: Request, res: Response) => {
-  req.query['author'] = req.params.userId;
+  const shop = await Shop.findById(req.params.shopId);
+  if (!shop) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'resturant not found!');
+  }
+  req.query['author'] = shop?.author?.toString();
   const result = await toppingService.getAllTopping(req.query);
   sendResponse(res, {
     statusCode: 200,
