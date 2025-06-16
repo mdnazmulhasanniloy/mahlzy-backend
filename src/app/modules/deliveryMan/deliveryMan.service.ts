@@ -36,24 +36,27 @@ const createDeliveryMan = async (payload: IUser, userId: string) => {
           email: payload?.email,
           phoneNumber: payload?.phoneNumber,
           password,
+          expireAt: null,
           role: USER_ROLE.delivery_man,
           verification: { status: true },
         },
       ],
       { session },
     );
-    if (user && user?.length > 0) {
+
+    if (!user || user?.length <= 0) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
         'delivery man account creation failed',
       );
     }
+    console.log(!user, user?.length <= 0);
     const data = {
       user: user[0]?._id,
       shop: (author.shop as IShop)?._id,
       lastLocation: {
         type: 'Point',
-        coordinates: [90.4125, 23.8103],
+        coordinates: [],
       },
     };
 
@@ -79,20 +82,23 @@ const createDeliveryMan = async (payload: IUser, userId: string) => {
     );
 
     return deliveryMan[0];
-  } catch (error) {
+  } catch (error: any) {
+    console.log(error);
     await session.abortTransaction();
     session.endSession();
-    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create deliveryMan');
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      error?.message ?? 'Failed to create deliveryMan',
+    );
   }
 };
 
 const getAllDeliveryMan = async (query: Record<string, any>) => {
-  query[''] = false;
   const deliveryManModel = new QueryBuilder(
     DeliveryMan.find({ isDeleted: false }),
     query,
   )
-    .search([''])
+    .search(['vehicleType'])
     .filter()
     .paginate()
     .sort()

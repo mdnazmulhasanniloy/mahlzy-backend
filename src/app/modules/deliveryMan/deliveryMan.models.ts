@@ -17,7 +17,7 @@ const deliveryManSchema = new Schema<IDeliveryMan>(
     shop: {
       type: Schema.Types.ObjectId,
       ref: 'Shop',
-      required: true, 
+      required: true,
     },
     vehicleType: {
       type: String,
@@ -37,12 +37,10 @@ const deliveryManSchema = new Schema<IDeliveryMan>(
     },
     lastLocation: {
       type: {
-        type: {
-          type: String,
-          default: 'Point',
-        },
-        coordinates: [Number],
+        type: String,
+        default: 'Point',
       },
+      coordinates: [Number],
     },
     isDeleted: { type: Boolean, default: false },
   },

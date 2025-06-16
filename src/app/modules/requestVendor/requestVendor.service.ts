@@ -14,6 +14,37 @@ import { USER_ROLE } from '../user/user.constants';
 import { startSession } from 'mongoose';
 
 const createRequestVendor = async (payload: IRequestVendor, file: any) => {
+  const isAlreadyExistName = await Shop.findOne({
+    shopName: payload.businessName,
+  });
+
+  if (isAlreadyExistName) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Already have a account using this shop name',
+    );
+  }
+
+  const isAlreadyExistEmail = await Shop.findOne({
+    shopName: payload.businessName,
+  });
+
+  if (isAlreadyExistEmail) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Already have a account using this email',
+    );
+  }
+  const isAlreadyExistPhone = await Shop.findOne({
+    shopPhoneNumber: payload.phoneNumber,
+  });
+  if (isAlreadyExistPhone) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Already have a account using this phoneNumber',
+    );
+  }
+
   if (file) {
     payload.image = (await uploadToS3({
       file: file,
@@ -27,6 +58,7 @@ const createRequestVendor = async (payload: IRequestVendor, file: any) => {
       'Failed to create requestVendor',
     );
   }
+
   return result;
 };
 
@@ -89,7 +121,6 @@ const approveRequestVendor = async (id: string) => {
     if (!request) {
       throw new AppError(httpStatus.BAD_REQUEST, 'RequestVendor not found');
     }
-
     const password = generateCryptoString(6);
     const user = await User.create(
       [
@@ -99,6 +130,7 @@ const approveRequestVendor = async (id: string) => {
           phoneNumber: request.phoneNumber,
           password: password,
           role: USER_ROLE.restaurant,
+          expireAt: null,
           verification: { status: true },
         },
       ],
@@ -112,7 +144,7 @@ const approveRequestVendor = async (id: string) => {
     const vendor = await Shop.create(
       [
         {
-          name: request.businessName,
+          shopName: request?.businessName,
           author: user[0]._id,
           shopMail: request.businessEmail,
           shopPhoneNumber: request.phoneNumber,
@@ -144,9 +176,9 @@ const approveRequestVendor = async (id: string) => {
       'Your Vendor Request has been approved',
       fs
         .readFileSync(otpEmailPath, 'utf8')
-        .replace('{{email}}', request.businessEmail)
-        .replace('{{password}}', password)
-        .replace('{{region}}', request.businessAddress),
+        .replace('{{account_email}}', request.businessEmail)
+        .replace('{{account_password}}', password)
+        .replace('{{vendor_name}}', request.businessName),
     );
 
     // Delete the RequestVendor after successfully creating the vendor
@@ -155,6 +187,7 @@ const approveRequestVendor = async (id: string) => {
     // Commit the transaction if all operations succeed
     await session.commitTransaction();
     session.endSession();
+    return vendor;
   } catch (error) {
     // Rollback the transaction if any operation fails
     await session.abortTransaction();
