@@ -5,8 +5,19 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/AppError';
 import { uploadToS3 } from '../../utils/s3';
 import generateCryptoString from '../../utils/generateCryptoString';
+import { User } from '../user/user.models';
 
-const createCuisines = async (payload: ICuisines, file: any) => {
+const createCuisines = async (
+  payload: ICuisines,
+  file: any,
+  userId: string,
+) => {
+  const user = await User.findById(userId);
+  console.log(user);
+  if (!user) throw new AppError(httpStatus.BAD_REQUEST, 'user not found');
+  //@ts-ignore
+  payload.shop = user.shop;
+
   if (file) {
     payload.image = (await uploadToS3({
       file: file,

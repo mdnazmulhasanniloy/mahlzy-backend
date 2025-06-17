@@ -1,10 +1,14 @@
 import { Request, Response } from 'express';
 import catchAsync from '../../utils/catchAsync';
 import { cuisinesService } from './cuisines.service';
-import sendResponse from '../../utils/sendResponse'; 
+import sendResponse from '../../utils/sendResponse';
 
 const createCuisines = catchAsync(async (req: Request, res: Response) => {
-  const result = await cuisinesService.createCuisines(req.body, req.file);
+  const result = await cuisinesService.createCuisines(
+    req.body,
+    req.file,
+    req.user.userId,
+  );
   sendResponse(res, {
     statusCode: 201,
     success: true,

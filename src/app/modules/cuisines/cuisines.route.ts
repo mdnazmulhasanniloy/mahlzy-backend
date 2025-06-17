@@ -11,21 +11,31 @@ const upload = multer({ storage });
 
 router.post(
   '/',
-  auth(USER_ROLE.admin, USER_ROLE.sub_admin, USER_ROLE.super_admin),
+  auth(USER_ROLE.restaurant),
   upload.single('image'),
   parseData(),
   cuisinesController.createCuisines,
 );
 router.patch(
   '/:id',
-  auth(USER_ROLE.admin, USER_ROLE.sub_admin, USER_ROLE.super_admin),
+  auth(
+    USER_ROLE.admin,
+    USER_ROLE.sub_admin,
+    USER_ROLE.super_admin,
+    USER_ROLE.restaurant,
+  ),
   upload.single('image'),
   parseData(),
   cuisinesController.updateCuisines,
 );
 router.delete(
   '/:id',
-  auth(USER_ROLE.admin, USER_ROLE.sub_admin, USER_ROLE.super_admin),
+  auth(
+    USER_ROLE.admin,
+    USER_ROLE.sub_admin,
+    USER_ROLE.super_admin,
+    USER_ROLE.restaurant,
+  ),
   cuisinesController.deleteCuisines,
 );
 router.get('/:id', cuisinesController.getCuisinesById);
