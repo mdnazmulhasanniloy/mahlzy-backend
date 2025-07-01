@@ -22,6 +22,13 @@ const shopSchema = new Schema<IShop>(
         required: true,
       },
     ],
+    reviews: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Categories',
+        required: true,
+      },
+    ],
     shopMail: {
       type: String,
       lowercase: true,
@@ -34,11 +41,15 @@ const shopSchema = new Schema<IShop>(
       required: [true, 'Phone number is required'],
       unique: true,
     },
-    
+
     shopName: {
       type: String,
-      required: [true, 'Name is required'],
+      required: [true, 'shopName is required'],
       unique: true,
+    },
+    avgRating: {
+      type: Number,
+      required: [true, 'Name is required'],
     },
 
     banner: {
@@ -97,6 +108,8 @@ const shopSchema = new Schema<IShop>(
     timestamps: true,
   },
 );
+
+shopSchema.index({ shopLocation: '2dsphere' });
 
 shopSchema.statics.isShopExistId = async function (id: string) {
   return await Shop.findById(id);

@@ -15,6 +15,7 @@ import { ordersRoutes } from '../modules/orders/orders.route';
 import stripeRoute from '../modules/stripe/stripe.route';
 import { paymentsRoutes } from '../modules/payments/payments.route';
 import { shopRoutes } from '../modules/shop/shop.route';
+import { reviewsRoutes } from '../modules/reviews/reviews.route';
 
 const router = Router();
 const moduleRoutes = [
@@ -83,9 +84,13 @@ const moduleRoutes = [
     route: paymentsRoutes,
   },
   {
-    path: "/shop",
-    route: shopRoutes
-  }
+    path: '/shop',
+    route: shopRoutes,
+  },
+  {
+    path: '/review',
+    route: reviewsRoutes,
+  },
 ];
 moduleRoutes.forEach(route => router.use(route.path, route.route));
 

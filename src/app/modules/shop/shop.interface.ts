@@ -15,9 +15,10 @@ export interface IShop {
   id: string;
   author: ObjectId;
   categories: ObjectId[];
-  // deliveryCharge:number,
+  reviews: ObjectId[];
+  avgRating: number;
 
-  shopMail: string; 
+  shopMail: string;
   shopPhoneNumber: string;
   shopName: string;
   banner: string;
