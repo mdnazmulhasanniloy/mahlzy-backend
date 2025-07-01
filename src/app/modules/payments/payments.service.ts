@@ -16,14 +16,16 @@ import { ORDER_STATUS } from '../orders/orders.constants';
 import { notificationServices } from '../notification/notification.service';
 import { IUser } from '../user/user.interface';
 import { modeType } from '../notification/notification.interface';
+import { IProducts } from '../products/products.interface';
 
 const checkout = async (payload: IPayments) => {
   const tranId = generateCryptoString(10);
   let paymentData: IPayments;
 
   const order: IOrders | null = await Orders?.findById(payload?.order).populate(
-    'reference',
+    'orderItems.product',
   );
+  console.log("🚀 ~ checkout ~ order:", order)
 
   if (!order) {
     throw new AppError(httpStatus.NOT_FOUND, 'Order Not Found!');
@@ -44,14 +46,16 @@ const checkout = async (payload: IPayments) => {
 
     paymentData = payment as IPayments;
   } else {
-    const admin = await User.findOne({ role: USER_ROLE.admin });
-    if (!admin)
-      throw new AppError(httpStatus.BAD_REQUEST, 'server internel Error');
+    const orderCharge = await User.findOne({ role: USER_ROLE.admin }).then(
+      admin => (admin?.orderCharge ? admin?.orderCharge : 0),
+    );
+    // if (!admin)
+    //   throw new AppError(httpStatus.BAD_REQUEST, 'server internel Error');
 
     payload.tranId = tranId;
     payload.author = order?.author as ObjectId;
-    payload.amount = order.totalPrice;
-    payload.amount = order.totalPrice * admin.orderCharge;
+    payload.amount = Math.round(Number(order.totalPrice) + Number(orderCharge)); 
+    console.log(payload)
     const createdPayment = await Payments.create(payload);
 
     if (!createdPayment) {
@@ -69,8 +73,8 @@ const checkout = async (payload: IPayments) => {
   const product = {
     amount: Number(paymentData?.amount),
     //@ts-ignore
-    name: '',
-    quantity: order?.orderItems[0]?.quantity ?? 1,
+    name: (order?.orderItems[0]?.product as IProducts)?.name ?? 'A Foods',
+    quantity: Number(order?.orderItems[0]?.quantity) ?? 1,
   };
   let customerId;
   const user = await User.IsUserExistId(paymentData?.user?.toString());
@@ -87,7 +91,12 @@ const checkout = async (payload: IPayments) => {
   const success_url = `${config.server_url}/payments/confirm-payment?sessionId={CHECKOUT_SESSION_ID}&paymentId=${paymentData?._id}`;
 
   const cancel_url = `${config.server_url}/payments/confirm-payment?sessionId={CHECKOUT_SESSION_ID}&paymentId=${paymentData?._id}`;
-
+  console.log({
+    product,
+    success_url,
+    cancel_url,
+    customerId,
+  });
   const checkoutSession = await StripeService.getCheckoutSession(
     product,
     success_url,

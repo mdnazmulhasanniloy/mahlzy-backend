@@ -50,7 +50,7 @@ const ordersSchema = new Schema<IOrders>(
       {
         product: {
           type: Schema.Types.ObjectId,
-          ref: 'Product',
+          ref: 'Products',
           required: true,
         },
         quantity: {
@@ -67,7 +67,7 @@ const ordersSchema = new Schema<IOrders>(
       {
         topping: {
           type: Schema.Types.ObjectId,
-          ref: 'Product',
+          ref: 'Topping',
           required: true,
         },
         quantity: {

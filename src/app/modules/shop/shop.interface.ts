@@ -17,8 +17,7 @@ export interface IShop {
   categories: ObjectId[];
   // deliveryCharge:number,
 
-  shopMail: string;
-  deliveryFee: number;
+  shopMail: string; 
   shopPhoneNumber: string;
   shopName: string;
   banner: string;
