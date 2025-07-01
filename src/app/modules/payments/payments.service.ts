@@ -24,8 +24,7 @@ const checkout = async (payload: IPayments) => {
 
   const order: IOrders | null = await Orders?.findById(payload?.order).populate(
     'orderItems.product',
-  );
-  console.log("🚀 ~ checkout ~ order:", order)
+  ); 
 
   if (!order) {
     throw new AppError(httpStatus.NOT_FOUND, 'Order Not Found!');
@@ -55,7 +54,7 @@ const checkout = async (payload: IPayments) => {
     payload.tranId = tranId;
     payload.author = order?.author as ObjectId;
     payload.amount = Math.round(Number(order.totalPrice) + Number(orderCharge)); 
-    console.log(payload)
+   
     const createdPayment = await Payments.create(payload);
 
     if (!createdPayment) {
@@ -150,7 +149,7 @@ const confirmPayment = async (query: Record<string, any>) => {
       receiver: (payment?.user as IUser)?._id,
       message: 'Payment Successful',
       description: `Your payment for the Order #"${order && order.id}" was successful.`,
-      reference: payment?._id,
+      refference: payment?._id,
       model_type: modeType.Payments,
     });
 
@@ -159,7 +158,7 @@ const confirmPayment = async (query: Record<string, any>) => {
       receiver: (payment?.author as IUser)?._id,
       message: 'New Payment Received',
       description: `You have received a payment for the Order #"${order && order.id}".`,
-      reference: payment?._id,
+      refference: payment?._id,
       model_type: modeType.Payments,
     });
 
