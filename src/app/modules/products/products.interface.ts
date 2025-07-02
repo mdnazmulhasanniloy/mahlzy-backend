@@ -19,9 +19,7 @@ export interface IProducts {
   sauceLevel: string;
   toppings: ObjectId[];
   discount: number;
-  images: IImages[];
-  totalReview: number;
-  avgRatings: number;
+  images: IImages[]; 
   totalSell: number;
   isDeleted: boolean;
 }

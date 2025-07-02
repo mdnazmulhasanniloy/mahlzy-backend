@@ -15,7 +15,10 @@ const upload = multer({ storage });
 router.patch(
   '/my-shop',
   auth(USER_ROLE.restaurant),
-  upload.single('banner'),
+  upload.fields([
+    { name: 'profile', maxCount: 1 },
+    { name: 'banner', maxCount: 1 },
+  ]),
   parseData(),
   shopController.updateMyShop,
 );
@@ -23,7 +26,10 @@ router.patch(
 router.patch(
   '/:id',
   auth(USER_ROLE.admin),
-  upload.single('banner'),
+  upload.fields([
+    { name: 'profile', maxCount: 1 },
+    { name: 'banner', maxCount: 1 },
+  ]),
   parseData(),
   shopController.updateShop,
 );
@@ -34,11 +40,7 @@ router.delete(
   shopController.deleteShop,
 );
 
-router.get(
-  '/my-shop',
-  auth(USER_ROLE.restaurant),
-  shopController.getMyShop,
-);
+router.get('/my-shop', auth(USER_ROLE.restaurant), shopController.getMyShop);
 router.get('/:id', shopController.getShopById);
 router.get('/', shopController.getAllShop);
 

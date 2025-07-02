@@ -3,6 +3,7 @@ import catchAsync from '../../utils/catchAsync';
 import { shopService } from './shop.service';
 import sendResponse from '../../utils/sendResponse';
 import { uploadToS3 } from '../../utils/s3';
+import { UploadedFiles } from '../../interface/common.interface';
 
 const createShop = catchAsync(async (req: Request, res: Response) => {
   const result = await shopService.createShop(req.body);
@@ -45,11 +46,20 @@ const getShopById = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateShop = catchAsync(async (req: Request, res: Response) => {
-  if (req.file) {
-    req.body.banner = await uploadToS3({
-      file: req.file,
-      fileName: `images/shop/banner/${Math.floor(100000 + Math.random() * 900000)}`,
-    });
+  if (req.files) {
+    const { profile, banner } = req.files as UploadedFiles;
+    if (banner?.length) {
+      req.body.banner = await uploadToS3({
+        file: banner[0],
+        fileName: `images/shop/banner/${Math.floor(100000 + Math.random() * 900000)}`,
+      });
+    }
+    if (profile?.length) {
+      req.body.banner = await uploadToS3({
+        file: profile[0],
+        fileName: `images/shop/profile/${Math.floor(100000 + Math.random() * 900000)}`,
+      });
+    }
   }
   const result = await shopService.updateShop(req.params.id, req.body);
   sendResponse(res, {
@@ -61,11 +71,20 @@ const updateShop = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateMyShop = catchAsync(async (req: Request, res: Response) => {
-  if (req.file) {
-    req.body.banner = await uploadToS3({
-      file: req.file,
-      fileName: `images/shop/banner/${Math.floor(100000 + Math.random() * 900000)}`,
-    });
+  if (req.files) {
+    const { profile, banner } = req.files as UploadedFiles;
+    if (banner?.length) {
+      req.body.banner = await uploadToS3({
+        file: banner[0],
+        fileName: `images/shop/banner/${Math.floor(100000 + Math.random() * 900000)}`,
+      });
+    }
+    if (profile?.length) {
+      req.body.banner = await uploadToS3({
+        file: profile[0],
+        fileName: `images/shop/profile/${Math.floor(100000 + Math.random() * 900000)}`,
+      });
+    }
   }
   const result = await shopService.updateMyShop(req?.user?.userId, req.body);
   sendResponse(res, {

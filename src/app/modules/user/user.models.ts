@@ -90,9 +90,7 @@ const userSchema: Schema<IUser> = new Schema(
     expireAt: {
       type: Date,
       default: () => {
-        const expireAt = new Date();
-
-        // return expireAt.setHours(expireAt.getHours() + 48);
+        const expireAt = new Date(); 
         return expireAt.setMinutes(expireAt.getMinutes() + 20);
       },
     },

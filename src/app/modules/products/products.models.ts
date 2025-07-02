@@ -79,17 +79,7 @@ const productsSchema = new Schema<IProducts>(
         },
       ],
     },
-    totalReview: {
-      type: Number,
-      default: 0,
-      min: [0, 'Total reviews cannot be negative'],
-    },
-    avgRatings: {
-      type: Number,
-      default: 0,
-      min: [0, 'Average rating cannot be negative'],
-      max: [5, 'Average rating cannot exceed 5'],
-    },
+
     totalSell: {
       type: Number,
       default: 0,
@@ -104,6 +94,7 @@ const productsSchema = new Schema<IProducts>(
   },
 );
 
+productsSchema.index({ price: 1 });
 productsSchema.statics.findByProductId = async function (id: string) {
   return await this.findOne({ id });
 };

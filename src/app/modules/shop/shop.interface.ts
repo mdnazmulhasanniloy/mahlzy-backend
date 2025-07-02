@@ -19,6 +19,7 @@ export interface IShop {
   avgRating: number;
 
   shopMail: string;
+  profile: string;
   shopPhoneNumber: string;
   shopName: string;
   banner: string;

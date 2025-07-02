@@ -56,6 +56,10 @@ const shopSchema = new Schema<IShop>(
       type: String,
       default: null,
     },
+    profile: {
+      type: String,
+      default: null,
+    },
 
     bannerColor: {
       type: String,
