@@ -41,26 +41,6 @@ const createProducts = async (payload: IProducts, files: any) => {
   return result;
 };
 
-// const getAllProducts = async (query: Record<string, any>) => {
-//   const productsModel = new QueryBuilder(
-//     Products.find({ isDeleted: false }),
-//     query,
-//   )
-//     .search(['name', 'shortDescriptions', 'descriptions'])
-//     .filter()
-//     .paginate()
-//     .sort()
-//     .fields();
-
-//   const data = await productsModel.modelQuery;
-//   const meta = await productsModel.countTotal();
-
-//   return {
-//     data,
-//     meta,
-//   };
-// };
-
 const getAllProducts = async (query: Record<string, any>) => {
   const { filters, pagination } = await pickQuery(query);
 
@@ -78,28 +58,9 @@ const getAllProducts = async (query: Record<string, any>) => {
   if (filtersData?.cuisines) {
     filtersData['cuisines'] = new Types.ObjectId(filtersData?.cuisines);
   }
-  // if (filtersData?.toppings) {
-  //   filtersData['toppings'] = new Types.ObjectId(filtersData?.toppings);
-  // }
 
   // Initialize the aggregation pipeline
   const pipeline: any[] = [];
-
-  // If latitude and longitude are provided, add $geoNear to the aggregation pipeline
-  // if (latitude && longitude) {
-  //   pipeline.push({
-  //     $geoNear: {
-  //       near: {
-  //         type: 'Point',
-  //         coordinates: [parseFloat(longitude), parseFloat(latitude)],
-  //       },
-  //       key: 'location',
-  //       maxDistance: parseFloat(5 as unknown as string) * 1609, // 5 miles to meters
-  //       distanceField: 'dist.calculated',
-  //       spherical: true,
-  //     },
-  //   });
-  // }
 
   // Add a match to exclude deleted documents
   pipeline.push({
@@ -245,22 +206,12 @@ const getAllProducts = async (query: Record<string, any>) => {
             as: 'cuisines',
           },
         },
-        // {
-        //   $lookup: {
-        //     from: 'reviews',
-        //     localField: 'reviews',
-        //     foreignField: '_id',
-        //     as: 'reviews',
-        //   },
-        // },
 
         {
           $addFields: {
             author: { $arrayElemAt: ['$author', 0] },
             shop: { $arrayElemAt: ['$shop', 0] },
             cuisines: { $arrayElemAt: ['$cuisines', 0] },
-            // facility: { $arrayElemAt: ['$facility', 0] },
-            // ratings: { $arrayElemAt: ['$ratings', 0] },
           },
         },
       ],
@@ -277,7 +228,6 @@ const getAllProducts = async (query: Record<string, any>) => {
     data,
   };
 };
-
 
 const getProductsById = async (id: string) => {
   const result = await Products.findById(id);

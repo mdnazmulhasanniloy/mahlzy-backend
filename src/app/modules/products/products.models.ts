@@ -95,6 +95,10 @@ const productsSchema = new Schema<IProducts>(
 );
 
 productsSchema.index({ price: 1 });
+productsSchema.index({ cuisines: 1 });
+productsSchema.index({ shop: 1 });
+productsSchema.index({ name: 'text' });
+productsSchema.index({ id: 1 }, { unique: true });
 productsSchema.statics.findByProductId = async function (id: string) {
   return await this.findOne({ id });
 };
