@@ -17,6 +17,7 @@ import { notificationServices } from '../notification/notification.service';
 import { IUser } from '../user/user.interface';
 import { modeType } from '../notification/notification.interface';
 import { IProducts } from '../products/products.interface';
+import Shop from '../shop/shop.models';
 
 const checkout = async (payload: IPayments) => {
   const tranId = generateCryptoString(10);
@@ -24,7 +25,7 @@ const checkout = async (payload: IPayments) => {
 
   const order: IOrders | null = await Orders?.findById(payload?.order).populate(
     'orderItems.product',
-  ); 
+  );
 
   if (!order) {
     throw new AppError(httpStatus.NOT_FOUND, 'Order Not Found!');
@@ -53,8 +54,8 @@ const checkout = async (payload: IPayments) => {
 
     payload.tranId = tranId;
     payload.author = order?.author as ObjectId;
-    payload.amount = Math.round(Number(order.totalPrice) + Number(orderCharge)); 
-   
+    payload.amount = Math.round(Number(order.totalPrice) + Number(orderCharge));
+
     const createdPayment = await Payments.create(payload);
 
     if (!createdPayment) {
@@ -141,6 +142,12 @@ const confirmPayment = async (query: Record<string, any>) => {
         tranId: payment?.tranId,
       },
       { new: true, session },
+    );
+
+    await Shop.updateOne(
+      { author: order?.author },
+      { $inc: { totalSeals: 1 } },
+      { session, upsert: false },
     );
 
     // const admin = await User.findOne({ role: USER_ROLE.admin });

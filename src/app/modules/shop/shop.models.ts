@@ -105,7 +105,10 @@ const shopSchema = new Schema<IShop>(
         type: [Number],
       },
     },
-
+    totalSeals: {
+      type: Number,
+      default: 0,
+    },
     isDeleted: { type: Boolean, default: false },
   },
   {
@@ -114,6 +117,8 @@ const shopSchema = new Schema<IShop>(
 );
 
 shopSchema.index({ shopLocation: '2dsphere' });
+shopSchema.index({ totalSeals: 1 });
+shopSchema.index({ author: 1 });
 
 shopSchema.statics.isShopExistId = async function (id: string) {
   return await Shop.findById(id);
