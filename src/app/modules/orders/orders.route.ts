@@ -30,9 +30,9 @@ router.delete('/:id', ordersController.deleteOrders);
 router.get(
   '/my-shop-orders',
   auth(USER_ROLE.restaurant),
-  ordersController.getMyOrders,
+  ordersController.getShopOrders,
 );
-router.get('/my-orders', auth(USER_ROLE.user), ordersController.getShopOrders);
+router.get('/my-orders', auth(USER_ROLE.user), ordersController.getMyOrders);
 router.get(
   '/delivery-man-orders',
   auth(USER_ROLE.delivery_man),
