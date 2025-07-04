@@ -35,7 +35,8 @@ const createOrders = async (payload: IOrders) => {
 };
 
 const getAllOrders = async (query: Record<string, any>) => {
-  const ordersModel = new QueryBuilder(Orders.find({ isDeleted: false }), query)
+  const ordersModel = new QueryBuilder(Orders.find({ isDeleted: false }).populate('orderItems.product')
+      .populate('additionalItems.topping'), query)
     .search([''])
     .filter()
     .paginate()
@@ -52,7 +53,8 @@ const getAllOrders = async (query: Record<string, any>) => {
 };
 
 const getOrdersById = async (id: string) => {
-  const result = await Orders.findById(id);
+  const result = await Orders.findById(id).populate('orderItems.product')
+      .populate('additionalItems.topping');
   if (!result || result?.isDeleted) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Orders not found!');
   }
