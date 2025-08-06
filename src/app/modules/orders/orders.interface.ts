@@ -13,6 +13,7 @@ export interface IOrders {
   status: string;
   paymentStatus: string;
   trnId: string;
+  comment: string;
   orderItems: {
     product: ObjectId | IProducts;
     quantity: number;
