@@ -5,4 +5,4 @@ export enum ORDER_STATUS {
   onTheWay = 'onTheWay',
   delivered = 'delivered',
   canceled = 'canceled',
-}
+} 

@@ -39,9 +39,10 @@ const ordersSchema = new Schema<IOrders>(
     },
     paymentStatus: {
       type: String,
-      enum: ['pending', 'paid', 'pickup'],
+      enum: ['pending', 'paid', 'pickup', 'cash_on_delivery'],
       default: 'pending',
     },
+
     trnId: {
       type: String,
       default: null,
@@ -101,6 +102,9 @@ const ordersSchema = new Schema<IOrders>(
             'Coordinates must be an array of two numbers [longitude, latitude]',
         },
       },
+    },
+    comment: {
+      type: String,
     },
     billingDetails: {
       name: {
