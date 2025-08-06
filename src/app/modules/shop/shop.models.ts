@@ -40,7 +40,7 @@ const shopSchema = new Schema<IShop>(
       type: String,
       required: [true, 'Phone number is required'],
       unique: true,
-    },
+    }, 
 
     shopName: {
       type: String,

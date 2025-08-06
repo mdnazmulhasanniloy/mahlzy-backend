@@ -16,6 +16,7 @@ import stripeRoute from '../modules/stripe/stripe.route';
 import { paymentsRoutes } from '../modules/payments/payments.route';
 import { shopRoutes } from '../modules/shop/shop.route';
 import { reviewsRoutes } from '../modules/reviews/reviews.route';
+import { campaignRoutes } from '../modules/campaign/campaign.route';
 
 const router = Router();
 const moduleRoutes = [
@@ -90,6 +91,10 @@ const moduleRoutes = [
   {
     path: '/review',
     route: reviewsRoutes,
+  },
+  {
+    path: '/campaign',
+    route: campaignRoutes,
   },
 ];
 moduleRoutes.forEach(route => router.use(route.path, route.route));

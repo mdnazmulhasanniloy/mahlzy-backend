@@ -17,7 +17,7 @@ export interface IShop {
   categories: ObjectId[];
   reviews: ObjectId[];
   avgRating: number;
-  totalSeals: number;
+  totalSeals: number; 
 
   shopMail: string;
   profile: string;
