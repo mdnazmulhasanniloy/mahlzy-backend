@@ -88,7 +88,7 @@ const checkout = async (payload: IPayments) => {
     customerId = customer?.id;
   }
 
-  const success_url = `${config.server_url}/payments/confirm-payment?sessionId={CHECKOUT_SESSION_ID}&paymentId=${paymentData?._id}`;
+  const success_url = `${config.server_url}/payments/confirm-payment?sessionId={CHECKOUT_SESSION_ID}&paymentId=${paymentData?._id}&device=${payload?.device}`;
 
   const cancel_url = `${config.server_url}/payments/confirm-payment?sessionId={CHECKOUT_SESSION_ID}&paymentId=${paymentData?._id}`;
   console.log({
@@ -108,7 +108,7 @@ const checkout = async (payload: IPayments) => {
 };
 
 const confirmPayment = async (query: Record<string, any>) => {
-  const { sessionId, paymentId } = query;
+  const { sessionId, paymentId, device } = query;
   const session = await startSession();
   const PaymentSession = await StripeService.getPaymentSession(sessionId);
   const paymentIntentId = PaymentSession.payment_intent as string;
@@ -170,7 +170,7 @@ const confirmPayment = async (query: Record<string, any>) => {
     });
 
     await session.commitTransaction();
-    return payment;
+    return { ...payment?.toObject(), device };
   } catch (error: any) {
     await session.abortTransaction();
 

@@ -40,7 +40,7 @@ const shopSchema = new Schema<IShop>(
       type: String,
       required: [true, 'Phone number is required'],
       unique: true,
-    }, 
+    },
 
     shopName: {
       type: String,
@@ -49,7 +49,7 @@ const shopSchema = new Schema<IShop>(
     },
     avgRating: {
       type: Number,
-      required: [true, 'Name is required'],
+      required: [false, 'Name is required'],
     },
 
     banner: {

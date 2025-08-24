@@ -17,15 +17,6 @@ router.post(
   validateRequest(userValidation?.guestValidationSchema),
   userController.createUser,
 );
-
-router.patch(
-  '/:id',
-  auth(USER_ROLE.admin, USER_ROLE.sub_admin, USER_ROLE.super_admin),
-  upload.single('profile'),
-  parseData(),
-  userController.updateUser,
-);
-
 router.patch(
   '/update-my-profile',
   auth(
@@ -39,6 +30,13 @@ router.patch(
   upload.single('profile'),
   parseData(),
   userController.updateMyProfile,
+);
+router.patch(
+  '/:id',
+  auth(USER_ROLE.admin, USER_ROLE.sub_admin, USER_ROLE.super_admin),
+  upload.single('profile'),
+  parseData(),
+  userController.updateUser,
 );
 
 router.delete(

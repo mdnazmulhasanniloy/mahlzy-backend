@@ -3,6 +3,7 @@ import catchAsync from '../../utils/catchAsync';
 import { paymentsService } from './payments.service';
 import sendResponse from '../../utils/sendResponse';
 import httpStatus from 'http-status';
+import config from '../../config';
 
 const checkout = catchAsync(async (req: Request, res: Response) => {
   req.body.user = req.user.userId;
@@ -17,7 +18,12 @@ const checkout = catchAsync(async (req: Request, res: Response) => {
 
 const confirmPayment = catchAsync(async (req: Request, res: Response) => {
   const result = await paymentsService.confirmPayment(req?.query);
-  // res.redirect(`${config.success_url}?subscriptionId=${result?.subscription}`);
+  //
+  if (result?.device === 'web') {
+    res.redirect(
+      `${config.client_Url}/payments/success?paymentId=${result?._id}`,
+    );
+  }
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,

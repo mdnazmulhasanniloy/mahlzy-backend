@@ -118,6 +118,7 @@ const approveRequestVendor = async (id: string) => {
   try {
     const request: IRequestVendor | null =
       await RequestVendor.findById(id).session(session);
+    console.log("🚀 ~ approveRequestVendor ~ request:", request)
     if (!request) {
       throw new AppError(httpStatus.BAD_REQUEST, 'RequestVendor not found');
     }
