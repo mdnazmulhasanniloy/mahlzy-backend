@@ -61,6 +61,7 @@ const updateShop = catchAsync(async (req: Request, res: Response) => {
       });
     }
   }
+
   const result = await shopService.updateShop(req.params.id, req.body);
   sendResponse(res, {
     statusCode: 200,
@@ -80,7 +81,7 @@ const updateMyShop = catchAsync(async (req: Request, res: Response) => {
       });
     }
     if (profile?.length) {
-      req.body.banner = await uploadToS3({
+      req.body.profile = await uploadToS3({
         file: profile[0],
         fileName: `images/shop/profile/${Math.floor(100000 + Math.random() * 900000)}`,
       });

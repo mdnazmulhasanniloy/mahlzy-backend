@@ -4,6 +4,7 @@ import { IOrders } from '../orders/orders.interface';
 
 export interface IPayments {
   _id: string;
+  device: 'web' | 'mobile';
   id: string;
   user: ObjectId | IUser;
   author: ObjectId | IUser;
