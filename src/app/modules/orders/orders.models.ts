@@ -62,6 +62,10 @@ const ordersSchema = new Schema<IOrders>(
           type: Number,
           required: true,
         },
+        additionalDetails: {
+          type: String,
+          default: null,
+        },
       },
     ],
     additionalItems: [

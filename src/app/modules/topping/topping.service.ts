@@ -6,13 +6,8 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/AppError';
 import { uploadToS3 } from '../../utils/s3';
 
-const createTopping = async (payload: ITopping, file:any ) => {
-   if (file) {
-    payload.image = (await uploadToS3({
-      file: file,
-      fileName: `images/toppings/${Math.floor(100000 + Math.random() * 900000)}`,
-    })) as string;
-  }
+const createTopping = async (payload: ITopping ) => {
+  
   const result = await Topping.create(payload);
   if (!result) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create topping');
@@ -45,14 +40,9 @@ const getToppingById = async (id: string) => {
   return result;
 };
 
-const updateTopping = async (id: string, payload: Partial<ITopping>, file:any) => {
+const updateTopping = async (id: string, payload: Partial<ITopping>) => {
   
-   if (file) {
-    payload.image = (await uploadToS3({
-      file: file,
-      fileName: `images/toppings/${Math.floor(100000 + Math.random() * 900000)}`,
-    })) as string;
-  }
+  
 
   const result = await Topping.findByIdAndUpdate(id, payload, { new: true });
   if (!result) {

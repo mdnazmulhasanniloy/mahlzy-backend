@@ -3,8 +3,7 @@ import { IShop } from '../shop/shop.interface';
 
 export interface ICuisines {
   _id: string | ObjectId;
-  name: string;
-  image: string;
+  name: string; 
   shop: ObjectId | IShop;
   isDeleted: boolean;
 }
