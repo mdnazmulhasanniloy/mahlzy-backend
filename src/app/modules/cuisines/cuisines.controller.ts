@@ -6,8 +6,7 @@ import sendResponse from '../../utils/sendResponse';
 const createCuisines = catchAsync(async (req: Request, res: Response) => {
   const result = await cuisinesService.createCuisines(
     req.body,
-    req.file,
-    req.user.userId,
+    req.user.userId as string,
   );
   sendResponse(res, {
     statusCode: 201,

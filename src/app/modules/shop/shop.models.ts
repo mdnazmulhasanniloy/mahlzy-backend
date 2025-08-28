@@ -72,24 +72,6 @@ const shopSchema = new Schema<IShop>(
       default: 'pickup',
     },
 
-    openingTime: [
-      {
-        day: {
-          type: String,
-          enum: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-          required: [true, 'Day is required'],
-        },
-        openTime: {
-          type: String,
-          required: [true, 'Open time is required'],
-        },
-        closeTime: {
-          type: String,
-          required: [true, 'Close time is required'],
-        },
-      },
-    ],
-
     minDeliveryCharge: {
       type: Number,
       default: 0,
@@ -105,7 +87,7 @@ const shopSchema = new Schema<IShop>(
         type: [Number],
       },
     },
-    totalSeals: {
+    totalSales: {
       type: Number,
       default: 0,
     },
@@ -117,14 +99,18 @@ const shopSchema = new Schema<IShop>(
 );
 
 shopSchema.index({ shopLocation: '2dsphere' });
-shopSchema.index({ totalSeals: 1 });
+shopSchema.index({ totalSales: 1 });
 shopSchema.index({ author: 1 });
 
 shopSchema.statics.isShopExistId = async function (id: string) {
   return await Shop.findById(id);
 };
 shopSchema.statics.getShopByAuthor = async function (author: string) {
-  return await Shop.findOne({ author: author });
+  return await Shop.findOne({ author: author }).populate([
+    { path: 'reviews' },
+    { path: 'categories' },
+    { path: 'author', select: 'name email phoneNumber profile' },
+  ]);
 };
 
 const Shop = model<IShop, IShopModules>('Shop', shopSchema);

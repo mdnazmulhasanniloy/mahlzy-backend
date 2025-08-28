@@ -11,24 +11,12 @@ const toppingSchema = new Schema<ITopping>(
       type: Number,
       required: true,
     },
-    category: {
-      type: Types.ObjectId,
-      ref: 'Categories',
-      required: true,
-    },
     author: {
       type: Types.ObjectId,
       ref: 'User',
       required: true,
     },
-    description: {
-      type: String,
-      required: true,
-    },
-    image: {
-      type: String,
-      required: true,
-    },
+    
     isDeleted: { type: Boolean, default: false },
   },
   {

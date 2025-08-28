@@ -9,7 +9,7 @@ import Shop from '../shop/shop.models';
 
 const createTopping = catchAsync(async (req: Request, res: Response) => {
   req.body['author'] = req.user.userId;
-  const result = await toppingService.createTopping(req.body, req.file);
+  const result = await toppingService.createTopping(req.body);
   sendResponse(res, {
     statusCode: 201,
     success: true,
@@ -64,8 +64,7 @@ const getToppingById = catchAsync(async (req: Request, res: Response) => {
 const updateTopping = catchAsync(async (req: Request, res: Response) => {
   const result = await toppingService.updateTopping(
     req.params.id,
-    req.body,
-    req.file,
+    req.body, 
   );
   sendResponse(res, {
     statusCode: 200,

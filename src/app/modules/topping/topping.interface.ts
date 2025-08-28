@@ -2,11 +2,8 @@ import { Model, ObjectId } from 'mongoose';
 
 export interface ITopping {
   name: string;
-  price: number;
-  category: ObjectId;
-  author: ObjectId;
-  description: string;
-  image: string;
+  price: number; 
+  author: ObjectId;  
   isDeleted: boolean;
 }
 

@@ -18,6 +18,7 @@ export interface IOrders {
     product: ObjectId | IProducts;
     quantity: number;
     price: number;
+    additionalDetails: string;
   }[];
   additionalItems: {
     topping: ObjectId | ITopping;

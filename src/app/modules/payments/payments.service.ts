@@ -18,13 +18,181 @@ import { IUser } from '../user/user.interface';
 import { modeType } from '../notification/notification.interface';
 import { IProducts } from '../products/products.interface';
 import Shop from '../shop/shop.models';
+import { ITopping } from '../topping/topping.interface';
+
+interface IPaymentItems {
+  price_data: {
+    currency: string;
+    product_data: {
+      name: string;
+    };
+    unit_amount: number;
+  };
+  quantity: number;
+}
+
+interface IPaymentItems {
+  price_data: {
+    currency: string;
+    product_data: {
+      name: string;
+    };
+    unit_amount: number;
+  };
+  quantity: number;
+}
+
+// const checkout = async (payload: IPayments) => {
+//   const tranId = generateCryptoString(10);
+//   let paymentData: IPayments;
+
+//   // Fetch the order details, if order doesn't exist throw an error
+//   const order: IOrders | null = await Orders?.findById(payload?.order).populate(
+//     'orderItems.product',
+//     'additionalItems.topping',
+//   );
+
+//   if (!order) {
+//     throw new AppError(httpStatus.NOT_FOUND, 'Order Not Found!');
+//   }
+
+//   // Check if there's an existing pending payment for this order
+//   const isExistPayment: IPayments | null = await Payments.findOne({
+//     order: payload?.order,
+//     status: PAYMENT_STATUS.pending,
+//     user: payload?.user,
+//   });
+
+//   if (isExistPayment) {
+//     const payment = await Payments.findByIdAndUpdate(
+//       isExistPayment?._id,
+//       { tranId },
+//       { new: true },
+//     );
+//     paymentData = payment as IPayments;
+//   } else {
+//     // Calculate the order charge if any
+//     const orderCharge = await User.findOne({ role: USER_ROLE.admin }).then(
+//       admin => admin?.orderCharge ?? 0,
+//     );
+
+//     payload.tranId = tranId;
+//     payload.author = order?.author as ObjectId;
+//     payload.amount = Math.round(Number(order.totalPrice) + Number(orderCharge));
+
+//     // Create new payment entry in the database
+//     const createdPayment = await Payments.create(payload);
+
+//     if (!createdPayment) {
+//       throw new AppError(
+//         httpStatus.INTERNAL_SERVER_ERROR,
+//         'Failed to create payment',
+//       );
+//     }
+
+//     paymentData = createdPayment;
+//   }
+
+//   if (!paymentData)
+//     throw new AppError(httpStatus.BAD_REQUEST, 'Payment not found');
+
+//   // Prepare the products for checkout session
+//   const products: IPaymentItems[] = [];
+
+//   // Add order items to products list
+//   order?.orderItems?.forEach(item => {
+//     const price = Number((item?.product as IProducts)?.price);
+//     const quantity = Number(item?.quantity);
+
+//     // Validate the price and quantity before pushing to products
+//     if (isNaN(price) || isNaN(quantity) || price <= 0 || quantity <= 0) {
+//       console.error(
+//         `Invalid price or quantity for item: ${JSON.stringify(item)}`,
+//       );
+//       throw new AppError(
+//         httpStatus.BAD_REQUEST,
+//         `Invalid product details: ${JSON.stringify(item)}`,
+//       );
+//     }
+
+//     products.push({
+//       price_data: {
+//         currency: 'usd',
+//         product_data: {
+//           name: (item?.product as IProducts)?.name ?? 'A Foods',
+//         },
+//         unit_amount: Math.round(price * 100),
+//       },
+//       quantity: quantity,
+//     });
+//   });
+
+//   // Add additional items to products list
+//   order?.additionalItems?.forEach(item => {
+//     const price = Number((item.topping as ITopping).price);
+//     const quantity = Number(item?.quantity);
+
+//     // Validate the price and quantity before pushing to products
+//     if (isNaN(price) || isNaN(quantity) || price <= 0 || quantity <= 0) {
+//       console.error(
+//         `Invalid price or quantity for item: ${JSON.stringify(item)}`,
+//       );
+//       throw new AppError(
+//         httpStatus.BAD_REQUEST,
+//         `Invalid additional item details: ${JSON.stringify(item)}`,
+//       );
+//     }
+
+//     products.push({
+//       price_data: {
+//         currency: 'usd',
+//         product_data: {
+//           name: (item.topping as ITopping).name,
+//         },
+//         unit_amount: Math.round(price * 100),
+//       },
+//       quantity: quantity,
+//     });
+//   });
+
+//   // Check if user exists and has a customerId, if not create one
+//   let customerId;
+//   const user = await User.IsUserExistId(paymentData?.user?.toString());
+
+//   if (user?.customerId) {
+//     customerId = user?.customerId;
+//   } else {
+//     const customer = await StripeService.createCustomer(
+//       user?.email,
+//       user?.name,
+//     );
+//     customerId = customer?.id;
+//   }
+
+//   // Define success and cancel URLs
+//   const success_url = `${config.server_url}/payments/confirm-payment?sessionId={CHECKOUT_SESSION_ID}&paymentId=${paymentData?._id}&device=${payload?.device}`;
+//   const cancel_url = `${config.server_url}/payments/confirm-payment?sessionId={CHECKOUT_SESSION_ID}&paymentId=${paymentData?._id}`;
+
+//   // Create the checkout session using Stripe service
+//   const checkoutSession = await StripeService.getCheckoutSession(
+//     products,
+//     success_url,
+//     cancel_url,
+//     customerId,
+//   );
+
+//   return checkoutSession?.url;
+// };
 
 const checkout = async (payload: IPayments) => {
   const tranId = generateCryptoString(10);
   let paymentData: IPayments;
 
   const order: IOrders | null = await Orders?.findById(payload?.order).populate(
-    'orderItems.product',
+    [
+      { path: 'orderItems.product', select: 'name price' },
+      { path: 'additionalItems.topping', select: 'name price' },
+    ],
   );
 
   if (!order) {
@@ -69,13 +237,40 @@ const checkout = async (payload: IPayments) => {
 
   if (!paymentData)
     throw new AppError(httpStatus.BAD_REQUEST, 'payment not found');
+  const products: IPaymentItems[] = [];
+  if (order?.orderItems?.length)
+    order?.orderItems?.map(item =>
+      products.push({
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: (item?.product as IProducts)?.name ?? 'A Foods',
+          },
+          unit_amount: Math.round(
+            Number((item?.product as IProducts)?.price) * 100,
+          ),
+        },
+        quantity: Number(item?.quantity) ?? 1,
+      }),
+    );
 
-  const product = {
-    amount: Number(paymentData?.amount),
-    //@ts-ignore
-    name: (order?.orderItems[0]?.product as IProducts)?.name ?? 'A Foods',
-    quantity: Number(order?.orderItems[0]?.quantity) ?? 1,
-  };
+  if (order?.additionalItems?.length)
+    order?.additionalItems.map(item =>
+      products.push({
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: (item.topping as ITopping).name,
+          },
+          unit_amount: Math.round(
+            Number((item.topping as ITopping).price) * 100,
+          ),
+        },
+        quantity: Number(item?.quantity) ?? 1,
+      }),
+    );
+  // console.log(JSON.stringify(products));
+  // return products;
   let customerId;
   const user = await User.IsUserExistId(paymentData?.user?.toString());
   if (user?.customerId) {
@@ -92,13 +287,13 @@ const checkout = async (payload: IPayments) => {
 
   const cancel_url = `${config.server_url}/payments/confirm-payment?sessionId={CHECKOUT_SESSION_ID}&paymentId=${paymentData?._id}`;
   console.log({
-    product,
+    products,
     success_url,
     cancel_url,
     customerId,
   });
   const checkoutSession = await StripeService.getCheckoutSession(
-    product,
+    products,
     success_url,
     cancel_url,
     customerId,

@@ -8,9 +8,13 @@ import QueryBuilder from '../../builder/QueryBuilder';
 const createCategory = async (payload: ICategory) => {
   const category = await Category.isExistByName(payload?.name);
   if (category && category?.isDeleted) {
-    return await Category.findByIdAndUpdate(category?._id, payload, {
-      new: true,
-    });
+    return await Category.findByIdAndUpdate(
+      category?._id,
+      { ...payload, isDeleted: false },
+      {
+        new: true,
+      },
+    );
   }
 
   const result = await Category.create(payload);
@@ -21,7 +25,10 @@ const createCategory = async (payload: ICategory) => {
 };
 
 const getAllCategories = async (query: Record<string, any>) => {
-  const categoriesModel = new QueryBuilder(Category.find(), query)
+  const categoriesModel = new QueryBuilder(
+    Category.find({ isDeleted: false }),
+    query,
+  )
     .search(['name'])
     .filter()
     .paginate()
@@ -39,8 +46,8 @@ const getAllCategories = async (query: Record<string, any>) => {
 
 const getCategoryById = async (id: string) => {
   const result = await Category.findById(id);
-  if (!result) {
-    throw new Error('Category not found');
+  if (!result || result?.isDeleted) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Category not found');
   }
   return result;
 };
@@ -48,7 +55,7 @@ const getCategoryById = async (id: string) => {
 const updateCategory = async (id: string, payload: Partial<ICategory>) => {
   const result = await Category.findByIdAndUpdate(id, payload, { new: true });
   if (!result) {
-    throw new Error('Failed to update category');
+    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update category');
   }
   return result;
 };

@@ -17,7 +17,7 @@ export interface IShop {
   categories: ObjectId[];
   reviews: ObjectId[];
   avgRating: number;
-  totalSeals: number; 
+  totalSales: number;
 
   shopMail: string;
   profile: string;
@@ -25,8 +25,7 @@ export interface IShop {
   shopName: string;
   banner: string;
   bannerColor: string;
-  deliveryType: 'pickup' | 'delivery' | 'booth';
-  openingTime: IOpeningTime[];
+  deliveryType: 'pickup' | 'delivery' | 'booth'; 
   minDeliveryCharge: number;
   shopLocation: ILocation;
   isDeleted: boolean;

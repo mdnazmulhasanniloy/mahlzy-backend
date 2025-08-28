@@ -7,11 +7,7 @@ const cuisinesSchema = new Schema<ICuisines>(
       type: String,
       required: true,
       unique: true,
-    },
-    image: {
-      type: String,
-      default: null,
-    },
+    }, 
     shop: {
       type: Types.ObjectId,
       ref: 'Shop',
