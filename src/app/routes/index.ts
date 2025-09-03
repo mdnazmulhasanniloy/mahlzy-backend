@@ -18,6 +18,7 @@ import { shopRoutes } from '../modules/shop/shop.route';
 import { reviewsRoutes } from '../modules/reviews/reviews.route';
 import { campaignRoutes } from '../modules/campaign/campaign.route';
 import { openingTimeRoutes } from '../modules/openingTime/openingTime.route';
+import { bookMarkRoutes } from '../modules/bookMark/bookMark.route';
 
 const router = Router();
 const moduleRoutes = [
@@ -100,6 +101,10 @@ const moduleRoutes = [
   {
     path: '/opening-time',
     route: openingTimeRoutes,
+  },
+  {
+    path: '/bookmark',
+    route: bookMarkRoutes,
   },
 ];
 moduleRoutes.forEach(route => router.use(route.path, route.route));
