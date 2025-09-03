@@ -19,6 +19,7 @@ import { reviewsRoutes } from '../modules/reviews/reviews.route';
 import { campaignRoutes } from '../modules/campaign/campaign.route';
 import { openingTimeRoutes } from '../modules/openingTime/openingTime.route';
 import { bookMarkRoutes } from '../modules/bookMark/bookMark.route';
+import { attributeRoutes } from '../modules/attribute/attribute.route';
 
 const router = Router();
 const moduleRoutes = [
@@ -105,6 +106,10 @@ const moduleRoutes = [
   {
     path: '/bookmark',
     route: bookMarkRoutes,
+  },
+  {
+    path: '/attributes',
+    route: attributeRoutes,
   },
 ];
 moduleRoutes.forEach(route => router.use(route.path, route.route));
