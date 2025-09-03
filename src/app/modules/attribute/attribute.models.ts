@@ -21,6 +21,10 @@ const attributeSchema = new Schema<IAttribute>(
     isRequired: { type: Boolean, default: false },
     placeholder: { type: String, default: null },
     options: { type: [OptionsSchema], default: [] },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

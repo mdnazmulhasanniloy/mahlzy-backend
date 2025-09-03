@@ -1,8 +1,10 @@
+import { query } from 'express';
 import httpStatus from 'http-status';
 import { IAttribute } from './attribute.interface';
 import Attribute from './attribute.models';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/AppError';
+import Products from '../products/products.models';
 
 const createAttribute = async (payload: IAttribute) => {
   const result = await Attribute.create(payload);
@@ -13,8 +15,10 @@ const createAttribute = async (payload: IAttribute) => {
 };
 
 const getAllAttribute = async (query: Record<string, any>) => {
+  // const result = Attribute.find({ product: query.product });
+  // return result;
   const attributeModel = new QueryBuilder(
-    Attribute.find({ isDeleted: false }).populate('product'),
+    Attribute.find({ isDeleted: false }),
     query,
   )
     .search(['title'])
@@ -22,7 +26,6 @@ const getAllAttribute = async (query: Record<string, any>) => {
     .paginate()
     .sort()
     .fields();
-
   const data = await attributeModel.modelQuery;
   const meta = await attributeModel.countTotal();
 
@@ -33,7 +36,7 @@ const getAllAttribute = async (query: Record<string, any>) => {
 };
 
 const getAttributeById = async (id: string) => {
-  const result = await Attribute.findById(id);
+  const result = await Attribute.findById(id).populate('product');
   if (!result || result?.isDeleted) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Attribute not found!');
   }
@@ -41,7 +44,9 @@ const getAttributeById = async (id: string) => {
 };
 
 const updateAttribute = async (id: string, payload: Partial<IAttribute>) => {
-  const result = await Attribute.findByIdAndUpdate(id, payload, { new: true });
+  const result = await Attribute.findByIdAndUpdate(id, payload, {
+    new: true,
+  });
   if (!result) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update Attribute');
   }
