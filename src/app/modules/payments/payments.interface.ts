@@ -1,14 +1,20 @@
 import { Model, ObjectId } from 'mongoose';
 import { IUser } from '../user/user.interface';
 import { IOrders } from '../orders/orders.interface';
+import { ICampaign } from '../campaign/campaign.interface';
 
+export enum PAYMENT_MODEL_TYPE {
+  Orders = 'Orders',
+  Campaign = 'Campaign',
+}
 export interface IPayments {
   _id: string;
   device: 'web' | 'mobile';
   id: string;
   user: ObjectId | IUser;
-  author: ObjectId | IUser;
-  order: ObjectId | IOrders;
+  modelType: PAYMENT_MODEL_TYPE;
+  reference: ObjectId | IOrders | ICampaign;
+  author: ObjectId | IUser; 
   amount: Number;
   status: 'paid' | 'pending' | 'cancel' | 'refound';
   isTransfer: boolean;

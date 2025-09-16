@@ -1,5 +1,5 @@
 import httpStatus from 'http-status';
-import { IPayments } from './payments.interface';
+import { IPayments, PAYMENT_MODEL_TYPE } from './payments.interface';
 import Payments from './payments.models';
 import QueryBuilder from '../../builder/QueryBuilder';
 import AppError from '../../error/AppError';
@@ -19,6 +19,7 @@ import { modeType } from '../notification/notification.interface';
 import { IProducts } from '../products/products.interface';
 import Shop from '../shop/shop.models';
 import { ITopping } from '../topping/topping.interface';
+import moment from 'moment';
 
 interface IPaymentItems {
   price_data: {
@@ -185,121 +186,134 @@ interface IPaymentItems {
 // };
 
 const checkout = async (payload: IPayments) => {
-  const tranId = generateCryptoString(10);
-  let paymentData: IPayments;
+  let paymentData: IPayments | null;
 
-  const order: IOrders | null = await Orders?.findById(payload?.order).populate(
-    [
-      { path: 'orderItems.product', select: 'name price' },
-      { path: 'additionalItems.topping', select: 'name price' },
-    ],
-  );
+  switch (payload?.modelType) {
+    case PAYMENT_MODEL_TYPE.Orders: {
+      const order: IOrders | null = await Orders?.findById(payload?.reference);
 
-  if (!order) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Order Not Found!');
-  }
+      if (!order) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Order Not Found!');
+      }
 
-  const isExistPayment: IPayments | null = await Payments.findOne({
-    order: payload?.order,
-    status: PAYMENT_STATUS.pending,
-    user: payload?.user,
-  });
+      const isExistPayment: IPayments | null = await Payments.findOne({
+        reference: payload?.reference,
+        status: PAYMENT_STATUS.pending,
+        user: payload?.user,
+      });
 
-  if (isExistPayment) {
-    const payment = await Payments.findByIdAndUpdate(
-      isExistPayment?._id,
-      { tranId },
-      { new: true },
-    );
+      if (isExistPayment) {
+        paymentData = isExistPayment as IPayments;
+      } else {
+        const orderCharge = await User.findOne({ role: USER_ROLE.admin }).then(
+          admin => (admin?.orderCharge ? admin?.orderCharge : 0),
+        );
+        // if (!admin)
+        //   throw new AppError(httpStatus.BAD_REQUEST, 'server internel Error');
 
-    paymentData = payment as IPayments;
-  } else {
-    const orderCharge = await User.findOne({ role: USER_ROLE.admin }).then(
-      admin => (admin?.orderCharge ? admin?.orderCharge : 0),
-    );
-    // if (!admin)
-    //   throw new AppError(httpStatus.BAD_REQUEST, 'server internel Error');
+        payload.author = order?.author as ObjectId;
+        payload.amount = parseFloat(
+          Number(order.totalPrice) + Number(orderCharge).toFixed(2),
+        );
+        payload.modelType = PAYMENT_MODEL_TYPE.Orders;
 
-    payload.tranId = tranId;
-    payload.author = order?.author as ObjectId;
-    payload.amount = Math.round(Number(order.totalPrice) + Number(orderCharge));
+        const createdPayment = await Payments.create(payload);
 
-    const createdPayment = await Payments.create(payload);
+        if (!createdPayment) {
+          throw new AppError(
+            httpStatus.INTERNAL_SERVER_ERROR,
+            'Failed to create payment',
+          );
+        }
+        paymentData = createdPayment;
+      }
 
-    if (!createdPayment) {
-      throw new AppError(
-        httpStatus.INTERNAL_SERVER_ERROR,
-        'Failed to create payment',
+      if (!paymentData)
+        throw new AppError(httpStatus.BAD_REQUEST, 'payment not found');
+
+      const products: IPaymentItems[] = [];
+      products.push({
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: `Order of Food Items - Total: $${Number(paymentData?.amount).toFixed(2)}`,
+          },
+          unit_amount: parseFloat(
+            (Number(paymentData?.amount) * 100).toFixed(2),
+          ),
+        },
+        quantity: 1,
+      });
+      // if (order?.orderItems?.length)
+      //   order?.orderItems?.map(item =>
+      //     products.push({
+      //       price_data: {
+      //         currency: 'usd',
+      //         product_data: {
+      //           name: (item?.product as IProducts)?.name ?? 'A Foods',
+      //         },
+      //         unit_amount: Math.round(
+      //           Number((item?.product as IProducts)?.price) * 100,
+      //         ),
+      //       },
+      //       quantity: Number(item?.quantity) ?? 1,
+      //     }),
+      //   );
+
+      // if (order?.additionalItems?.length)
+      //   order?.additionalItems.map(item =>
+      //     products.push({
+      //       price_data: {
+      //         currency: 'usd',
+      //         product_data: {
+      //           name: (item.topping as ITopping).name,
+      //         },
+      //         unit_amount: Math.round(
+      //           Number((item.topping as ITopping).price) * 100,
+      //         ),
+      //       },
+      //       quantity: Number(item?.quantity) ?? 1,
+      //     }),
+      //   );
+      // console.log(JSON.stringify(products));
+      // return products;
+      let customerId;
+      const user = await User.IsUserExistId(paymentData?.user?.toString());
+      if (user?.customerId) {
+        customerId = user?.customerId;
+      } else {
+        const customer = await StripeService.createCustomer(
+          user?.email,
+          user?.name,
+        );
+        customerId = customer?.id;
+      }
+
+      const success_url = `${config.server_url}/payments/confirm-payment?sessionId={CHECKOUT_SESSION_ID}&paymentId=${paymentData?._id}&device=${payload?.device}`;
+
+      const cancel_url = `${config.server_url}/payments/confirm-payment?sessionId={CHECKOUT_SESSION_ID}&paymentId=${paymentData?._id}`;
+      console.log({
+        products,
+        success_url,
+        cancel_url,
+        customerId,
+      });
+      const checkoutSession = await StripeService.getCheckoutSession(
+        products,
+        success_url,
+        cancel_url,
+        customerId,
       );
+
+      return checkoutSession?.url;
     }
-    paymentData = createdPayment;
+
+    default:
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        `ModelType is required, this filed enum ${PAYMENT_MODEL_TYPE.Orders} or ${PAYMENT_MODEL_TYPE.Campaign}`,
+      );
   }
-
-  if (!paymentData)
-    throw new AppError(httpStatus.BAD_REQUEST, 'payment not found');
-  const products: IPaymentItems[] = [];
-  if (order?.orderItems?.length)
-    order?.orderItems?.map(item =>
-      products.push({
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: (item?.product as IProducts)?.name ?? 'A Foods',
-          },
-          unit_amount: Math.round(
-            Number((item?.product as IProducts)?.price) * 100,
-          ),
-        },
-        quantity: Number(item?.quantity) ?? 1,
-      }),
-    );
-
-  if (order?.additionalItems?.length)
-    order?.additionalItems.map(item =>
-      products.push({
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: (item.topping as ITopping).name,
-          },
-          unit_amount: Math.round(
-            Number((item.topping as ITopping).price) * 100,
-          ),
-        },
-        quantity: Number(item?.quantity) ?? 1,
-      }),
-    );
-  // console.log(JSON.stringify(products));
-  // return products;
-  let customerId;
-  const user = await User.IsUserExistId(paymentData?.user?.toString());
-  if (user?.customerId) {
-    customerId = user?.customerId;
-  } else {
-    const customer = await StripeService.createCustomer(
-      user?.email,
-      user?.name,
-    );
-    customerId = customer?.id;
-  }
-
-  const success_url = `${config.server_url}/payments/confirm-payment?sessionId={CHECKOUT_SESSION_ID}&paymentId=${paymentData?._id}&device=${payload?.device}`;
-
-  const cancel_url = `${config.server_url}/payments/confirm-payment?sessionId={CHECKOUT_SESSION_ID}&paymentId=${paymentData?._id}`;
-  console.log({
-    products,
-    success_url,
-    cancel_url,
-    customerId,
-  });
-  const checkoutSession = await StripeService.getCheckoutSession(
-    products,
-    success_url,
-    cancel_url,
-    customerId,
-  );
-
-  return checkoutSession?.url;
 };
 
 const confirmPayment = async (query: Record<string, any>) => {
@@ -307,6 +321,8 @@ const confirmPayment = async (query: Record<string, any>) => {
   const session = await startSession();
   const PaymentSession = await StripeService.getPaymentSession(sessionId);
   const paymentIntentId = PaymentSession.payment_intent as string;
+  const paymentIntent =
+    await StripeService.getStripe().paymentIntents.retrieve(paymentIntentId);
 
   if (!(await StripeService.isPaymentSuccess(sessionId))) {
     throw new AppError(
@@ -317,55 +333,84 @@ const confirmPayment = async (query: Record<string, any>) => {
 
   try {
     session.startTransaction();
+
+    const charge = await StripeService.getStripe().charges.retrieve(
+      paymentIntent.latest_charge as string,
+    );
+
+    if (charge?.refunded) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Payment has been refunded');
+    }
+    const paymentDate = moment.unix(charge.created).format('YYYY-MM-DD HH:mm'); // Adjusted format
+
+    // Create the output object
+    const chargeDetails = {
+      amount: charge?.amount,
+      currency: charge?.currency,
+      status: charge?.status,
+      paymentMethod: charge?.payment_method,
+      paymentMethodDetails: charge?.payment_method_details?.card,
+      transactionId: charge?.balance_transaction,
+      cardLast4: charge?.payment_method_details?.card?.last4,
+      paymentDate: paymentDate,
+      receipt_url: charge?.receipt_url,
+    };
+
     const payment = await Payments.findByIdAndUpdate(
       paymentId,
-      { status: PAYMENT_STATUS?.paid, paymentIntentId: paymentIntentId },
-      { new: true, session },
-    ).populate([
-      { path: 'user', select: 'name _id email phoneNumber profile ' },
-      { path: 'author', select: 'name _id email phoneNumber profile' },
-    ]);
-
-    if (!payment) {
-      throw new AppError(httpStatus.NOT_FOUND, 'Payment Not Found!');
-    }
-    const order = await Orders.findByIdAndUpdate(
-      payment?.order,
       {
-        paymentStatus: PAYMENT_STATUS?.paid,
-        status: ORDER_STATUS?.ongoing,
-        tranId: payment?.tranId,
+        status: PAYMENT_STATUS?.paid,
+        paymentIntentId: paymentIntentId,
+        tranId: chargeDetails?.transactionId,
       },
       { new: true, session },
     );
 
-    await Shop.updateOne(
-      { author: order?.author },
-      { $inc: { totalSeals: 1 } },
-      { session, upsert: false },
-    );
+    if (!payment) {
+      throw new AppError(httpStatus.NOT_FOUND, 'Payment Not Found!');
+    }
 
-    // const admin = await User.findOne({ role: USER_ROLE.admin });
+    switch (payment?.modelType) {
+      case PAYMENT_MODEL_TYPE.Orders: {
+        const order = await Orders.findByIdAndUpdate(
+          payment?.reference,
 
-    notificationServices.insertNotificationIntoDb({
-      receiver: (payment?.user as IUser)?._id,
-      message: 'Payment Successful',
-      description: `Your payment for the Order #"${order && order.id}" was successful.`,
-      refference: payment?._id,
-      model_type: modeType.Payments,
-    });
+          {
+            paymentStatus: PAYMENT_STATUS?.paid,
+            status: ORDER_STATUS?.ongoing,
+            tranId: chargeDetails?.transactionId,
+          },
+          { new: true, session },
+        );
+        await Shop.updateOne(
+          { author: order?.author },
+          { $inc: { totalSeals: 1 } },
+          { session, upsert: false },
+        );
+       
+        // const admin = await User.findOne({ role: USER_ROLE.admin });
 
-    // For Restaurant (Seller)
-    notificationServices.insertNotificationIntoDb({
-      receiver: (payment?.author as IUser)?._id,
-      message: 'New Payment Received',
-      description: `You have received a payment for the Order #"${order && order.id}".`,
-      refference: payment?._id,
-      model_type: modeType.Payments,
-    });
+        notificationServices.insertNotificationIntoDb({
+          receiver: (payment?.user as IUser)?._id,
+          message: 'Payment Successful',
+          description: `Your payment for the Order #"${order && order.id}" was successful.`,
+          refference: payment?._id,
+          model_type: modeType.Payments,
+        });
 
-    await session.commitTransaction();
-    return { ...payment?.toObject(), device };
+        // For Restaurant (Seller)
+        notificationServices.insertNotificationIntoDb({
+          receiver: (payment?.author as IUser)?._id,
+          message: 'New Payment Received',
+          description: `You have received a payment for the Order #"${order && order.id}".`,
+          refference: payment?._id,
+          model_type: modeType.Payments,
+        });
+
+        await session.commitTransaction();
+        return { ...payment?.toObject(), ...chargeDetails, device };
+      }
+    }
   } catch (error: any) {
     await session.abortTransaction();
 

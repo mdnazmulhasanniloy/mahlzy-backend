@@ -19,11 +19,11 @@ const checkout = catchAsync(async (req: Request, res: Response) => {
 const confirmPayment = catchAsync(async (req: Request, res: Response) => {
   const result = await paymentsService.confirmPayment(req?.query);
   //
-  if (result?.device === 'web') {
-    res.redirect(
-      `${config.client_Url}/payments/success?paymentId=${result?._id}`,
-    );
-  }
+  // if (result?.device === 'web') {
+  //   res.redirect(
+  //     `${config.client_Url}/payments/success?paymentId=${result?._id}`,
+  //   );
+  // }
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,

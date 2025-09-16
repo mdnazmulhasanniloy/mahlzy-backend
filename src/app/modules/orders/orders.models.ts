@@ -24,6 +24,7 @@ const ordersSchema = new Schema<IOrders>(
     },
     coupon: {
       type: String,
+      default: null,
     },
     status: {
       type: String,
@@ -68,6 +69,7 @@ const ordersSchema = new Schema<IOrders>(
         },
       },
     ],
+
     additionalItems: [
       {
         topping: {
@@ -89,6 +91,7 @@ const ordersSchema = new Schema<IOrders>(
     deliveryMan: {
       type: Schema.Types.ObjectId,
       ref: 'User',
+      default: null,
     },
     deliveryLocation: {
       type: {
@@ -109,31 +112,40 @@ const ordersSchema = new Schema<IOrders>(
     },
     comment: {
       type: String,
+      default: null,
     },
     billingDetails: {
       name: {
         type: String,
+        default: null,
       },
       email: {
         type: String,
+        default: null,
       },
       phone: {
         type: String,
+        default: null,
       },
       address: {
         type: String,
+        default: null,
       },
       city: {
         type: String,
+        default: null,
       },
       state: {
         type: String,
+        default: null,
       },
       country: {
         type: String,
+        default: null,
       },
       zip: {
         type: String,
+        default: null,
       },
     },
     isDeleted: { type: Boolean, default: false },
