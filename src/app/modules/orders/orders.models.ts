@@ -8,24 +8,29 @@ const ordersSchema = new Schema<IOrders>(
       type: String,
       default: () => `ORDER-${generateCryptoString(10)}`,
     },
+
     user: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
     },
+
     author: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
     },
+
     totalPrice: {
       type: Number,
       required: true,
     },
+
     coupon: {
       type: String,
       default: null,
     },
+
     status: {
       type: String,
       enum: [
@@ -38,6 +43,7 @@ const ordersSchema = new Schema<IOrders>(
       ],
       default: 'pending',
     },
+
     paymentStatus: {
       type: String,
       enum: ['pending', 'paid', 'pickup', 'cash_on_delivery'],
@@ -147,6 +153,14 @@ const ordersSchema = new Schema<IOrders>(
         type: String,
         default: null,
       },
+    },
+    adminPercentage: {
+      type: Number,
+      default: 0,
+    },
+    resturantPercentage: {
+      type: Number,
+      default: 0,
     },
     isDeleted: { type: Boolean, default: false },
   },

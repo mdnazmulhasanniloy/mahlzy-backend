@@ -13,6 +13,8 @@ export interface IOrders {
   status: string;
   paymentStatus: string;
   trnId: string;
+  adminPercentage: number;
+  resturantPercentage: number;
   comment: string;
   orderItems: {
     product: ObjectId | IProducts;

@@ -11,7 +11,8 @@ import { modeType } from '../notification/notification.interface';
 import { IUser } from '../user/user.interface';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import { isAfter, subMinutes } from 'date-fns'; 
+import { isAfter, subMinutes } from 'date-fns';
+import Products from '../products/products.models';
 
 const createOrders = async (payload: IOrders) => {
   const author = await User.findById(payload.author);
@@ -26,6 +27,20 @@ const createOrders = async (payload: IOrders) => {
     }
   }
 
+  if (payload.paymentStatus === 'cash_on_delivery' || 'pickup') {
+    payload.adminPercentage = Number(
+      (Number(payload.totalPrice) * 0.05).toFixed(2),
+    );
+    payload.resturantPercentage =
+      Number(payload.totalPrice) - Number(payload.adminPercentage);
+  } else {
+    payload.adminPercentage = Number(
+      (Number(payload.totalPrice) * 0.1).toFixed(2),
+    );
+    payload.resturantPercentage =
+      Number(payload.totalPrice) - Number(payload.adminPercentage);
+  }
+
   const result = await Orders.create(payload);
   if (!result) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create orders');
@@ -34,8 +49,12 @@ const createOrders = async (payload: IOrders) => {
 };
 
 const getAllOrders = async (query: Record<string, any>) => {
-  const ordersModel = new QueryBuilder(Orders.find({ isDeleted: false }).populate('orderItems.product')
-      .populate('additionalItems.topping'), query)
+  const ordersModel = new QueryBuilder(
+    Orders.find({ isDeleted: false })
+      .populate('orderItems.product')
+      .populate('additionalItems.topping'),
+    query,
+  )
     .search([''])
     .filter()
     .paginate()
@@ -52,8 +71,9 @@ const getAllOrders = async (query: Record<string, any>) => {
 };
 
 const getOrdersById = async (id: string) => {
-  const result = await Orders.findById(id).populate('orderItems.product')
-      .populate('additionalItems.topping');
+  const result = await Orders.findById(id)
+    .populate('orderItems.product')
+    .populate('additionalItems.topping');
   if (!result || result?.isDeleted) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Orders not found!');
   }
@@ -182,6 +202,18 @@ const changeOrderStatus = async (id: string, payload: { status: string }) => {
       break;
 
     case ORDER_STATUS.delivered:
+      if (order?.orderItems?.length > 0) {
+        for (const item of order.orderItems) {
+          await Products.findByIdAndUpdate(
+            item.product,
+            {
+              $inc: { totalSell: item?.quantity || 0 },
+            },
+            { new: true },
+          );
+        }
+      }
+
       // Notify User
       await notificationServices.insertNotificationIntoDb({
         receiver: result.user,
