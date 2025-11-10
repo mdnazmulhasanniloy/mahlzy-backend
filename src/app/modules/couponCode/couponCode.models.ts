@@ -8,16 +8,24 @@ const couponCodeSchema = new Schema<ICouponCode>(
       type: Schema.Types.ObjectId,
       ref: 'User',
     },
-    code: {
+    title:{
       type: String,
-      unique: true,
+      required: true,
+    },
+    discountType:{
+      type: String,
+      enum: ['percentage', 'fixed'],
+      required: true,
+    },
+    code: {
+      type: String, 
       default: () => generateCryptoString(10),
     },
     expiredAt: {
       type: String,
       required: true,
     },
-    isActive: { type: Boolean, default: false },
+    isActive: { type: Boolean, default: true },
     discount: {
       type: Number,
       required: true,

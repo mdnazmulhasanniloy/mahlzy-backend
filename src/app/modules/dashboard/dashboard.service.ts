@@ -283,6 +283,8 @@ const resturantDashboardChart = async (query: Record<string, any>) => {
       monthlyIncome[_id.month - 1].income = Math.round(income);
     },
   );
+
+  
   const monthlyOrders = initializeMonthlyData('total') as monthlyOrders[];
   orderStatus.monthlyOrders.forEach(
     ({ _id, total }: { _id: { month: number }; total: number }) => {
@@ -313,9 +315,95 @@ const resturantDashboardTables = async (query: Record<string, any>) => {
   };
 };
 
+const resturantCustomerList = async (query: Record<string, any>) => {
+  const limit = query.limit ? parseInt(query.limit as string, 10) : 10;
+  const page = query.page ? parseInt(query.page as string, 10) : 1;
+  const skip = (page - 1) * limit;
+
+  const pipeline: any[] = [
+    {
+      $match: {
+        isDeleted: false,
+        author: new Types.ObjectId(query.userId),
+      },
+    },
+    {
+      $group: {
+        _id: '$user', // unique customers
+      },
+    },
+    {
+      $lookup: {
+        from: 'users',
+        localField: '_id',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    { $unwind: '$user' },
+  ];
+
+ 
+  if (query?.searchTerm) {
+    pipeline.push({
+      $match: {
+        $or: ['name', 'email'].map(field => ({
+          [`user.${field}`]: {
+            $regex: query.searchTerm,
+            $options: 'i',
+          },
+        })),
+      },
+    });
+  }
+
+  
+  pipeline.push({
+    $facet: {
+      totalCount: [{ $count: 'uniqueCustomers' }],
+      users: [
+        { $sort: { 'user.createdAt': -1 } },
+        { $skip: skip },
+        { $limit: limit },
+        {
+          $project: {
+            _id: '$user._id',
+            name: '$user.name',
+            email: '$user.email',
+            phoneNumber: '$user.phoneNumber',
+            status: '$user.status',
+            createdAt: '$user.createdAt',
+            location: '$user.location',
+          },
+        },
+      ],
+    },
+  });
+
+   
+  pipeline.push({
+    $project: {
+      uniqueCustomers: {
+        $ifNull: [{ $arrayElemAt: ['$totalCount.uniqueCustomers', 0] }, 0],
+      },
+      users: 1,
+    },
+  });
+
+  const result = await Orders.aggregate(pipeline);
+  return {
+    data: result[0].users || [],
+    meta:{
+      total: result[0].uniqueCustomers || 0,
+      page,
+      limit,
+    }
+  };
+};
 
 export const dashboardService = {
   resturantDashboardTopCard,
   resturantDashboardChart,
   resturantDashboardTables,
+  resturantCustomerList,
 };

@@ -21,20 +21,15 @@ const contentsSchema = new Schema<IContents>(
         url: { type: String, required: true },
       },
     ],
-    supports: {
-      type: String,
+    marketingPrice: {
+      type: Number,
+      default: 3,
     },
-    faq: {
-      type: String,
-    },
+    
     isDeleted: {
       type: Boolean,
       default: false,
-    },
-    createdBy: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-    },
+    }, 
   },
   {
     timestamps: true,

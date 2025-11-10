@@ -91,6 +91,10 @@ const shopSchema = new Schema<IShop>(
       type: Number,
       default: 0,
     },
+    marketingEx:{
+      type:Date,
+      default:null
+    },
     isDeleted: { type: Boolean, default: false },
   },
   {

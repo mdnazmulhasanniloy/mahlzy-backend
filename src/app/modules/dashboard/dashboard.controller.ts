@@ -43,9 +43,22 @@ const resturantDashboardTables = catchAsync(
     });
   },
 );
+const resturantCustomerList = catchAsync(
+  async (req: Request, res: Response) => {
+    req.query.userId = req?.user?.userId;
+    const result = await dashboardService.resturantCustomerList(req.query);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Dashboard resturant customer fetched successfully',
+      data: result,
+    });
+  },
+);
 
 export const dashboardController = {
   resturantDashboardTopCard,
   resturantDashboardChart,
   resturantDashboardTables,
+  resturantCustomerList,
 };

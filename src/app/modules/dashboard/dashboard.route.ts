@@ -20,5 +20,10 @@ router.get(
   auth(USER_ROLE.restaurant),
   dashboardController.resturantDashboardTables,
 );
+router.get(
+  '/resturant-customers',
+  auth(USER_ROLE.restaurant),
+  dashboardController.resturantCustomerList,
+);
 
 export const dashboardRoutes = router;

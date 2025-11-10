@@ -2,14 +2,12 @@ import { Model, ObjectId } from 'mongoose';
 
 export interface IContents {
   deleteKey?: string[];
-  _id?: string;
-  createdBy: ObjectId;
+  _id?: string; 
   aboutUs?: string;
+  marketingPrice: number;
   termsAndConditions?: string;
   banner: { key: string; url: string }[];
   privacyPolicy?: string;
-  supports?: string;
-  faq?: string;
   isDeleted?: boolean;
 }
 

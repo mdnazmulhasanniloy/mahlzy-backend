@@ -20,6 +20,9 @@ import { IProducts } from '../products/products.interface';
 import Shop from '../shop/shop.models';
 import { ITopping } from '../topping/topping.interface';
 import moment from 'moment';
+import Campaign from '../campaign/campaign.models';
+import Marketing from '../marketing/marketing.models';
+import { IShop } from './../shop/shop.interface';
 
 interface IPaymentItems {
   price_data: {
@@ -307,11 +310,87 @@ const checkout = async (payload: IPayments) => {
 
       return checkoutSession?.url;
     }
+    case PAYMENT_MODEL_TYPE.Marketing: {
+      const marketing = await Marketing.findById(payload?.reference);
+
+      if (!marketing) {
+        throw new AppError(httpStatus.NOT_FOUND, 'marketing Not Found!');
+      }
+
+      const isExistPayment: IPayments | null = await Payments.findOne({
+        reference: marketing?._id,
+        status: PAYMENT_STATUS.pending,
+        user: payload?.user,
+      });
+
+      if (isExistPayment) {
+        paymentData = isExistPayment as IPayments;
+      } else {
+        payload.author = payload?.user;
+        payload.amount = parseFloat(Number(marketing.amount).toFixed(2));
+        payload.modelType = PAYMENT_MODEL_TYPE.Marketing;
+        const createdPayment = await Payments.create(payload);
+        if (!createdPayment) {
+          throw new AppError(
+            httpStatus.INTERNAL_SERVER_ERROR,
+            'Failed to create payment',
+          );
+        }
+        paymentData = createdPayment;
+      }
+
+      if (!paymentData)
+        throw new AppError(httpStatus.BAD_REQUEST, 'payment not found');
+      const products: IPaymentItems[] = [];
+
+      products.push({
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: `Shop Marketing Promotion (${marketing?.duration} Days)`,
+          },
+          unit_amount: parseFloat(
+            (Number(paymentData?.amount) * 100).toFixed(2),
+          ),
+        },
+        quantity: 1,
+      });
+
+      let customerId;
+      const user = await User.IsUserExistId(paymentData?.user?.toString());
+      if (user?.customerId) {
+        customerId = user?.customerId;
+      } else {
+        const customer = await StripeService.createCustomer(
+          user?.email,
+          user?.name,
+        );
+        customerId = customer?.id;
+      }
+
+      const success_url = `${config.server_url}/payments/confirm-payment?sessionId={CHECKOUT_SESSION_ID}&paymentId=${paymentData?._id}&device=${payload?.device}`;
+
+      const cancel_url = `${config.server_url}/payments/confirm-payment?sessionId={CHECKOUT_SESSION_ID}&paymentId=${paymentData?._id}`;
+      console.log({
+        products,
+        success_url,
+        cancel_url,
+        customerId,
+      });
+      const checkoutSession = await StripeService.getCheckoutSession(
+        products,
+        success_url,
+        cancel_url,
+        customerId,
+      );
+
+      return checkoutSession?.url;
+    }
 
     default:
       throw new AppError(
         httpStatus.BAD_REQUEST,
-        `ModelType is required, this filed enum ${PAYMENT_MODEL_TYPE.Orders} or ${PAYMENT_MODEL_TYPE.Campaign}`,
+        `ModelType is required, this filed enum ${PAYMENT_MODEL_TYPE.Orders} or ${PAYMENT_MODEL_TYPE.Marketing}`,
       );
   }
 };
@@ -387,7 +466,7 @@ const confirmPayment = async (query: Record<string, any>) => {
           { $inc: { totalSeals: 1 } },
           { session, upsert: false },
         );
-       
+
         // const admin = await User.findOne({ role: USER_ROLE.admin });
 
         notificationServices.insertNotificationIntoDb({
@@ -409,6 +488,45 @@ const confirmPayment = async (query: Record<string, any>) => {
 
         await session.commitTransaction();
         return { ...payment?.toObject(), ...chargeDetails, device };
+      }
+
+      case PAYMENT_MODEL_TYPE.Marketing: {
+        const marketing = await Marketing.findByIdAndUpdate(
+          payment?.reference,
+          {
+            isPaid: true,
+          },
+        ).populate('shop');
+
+        if (!marketing)
+          throw new AppError(
+            httpStatus.BAD_REQUEST,
+            'marketing update failed!',
+          );
+
+        // const admin = await User.findOne({ role: USER_ROLE.admin });
+
+        notificationServices.insertNotificationIntoDb({
+          receiver: (payment?.user as IUser)?._id,
+          message: 'Marketing Payment Successful',
+          description: `Your payment for promoting "${(marketing.shop as IShop).shopName}" was successful. Your restaurant will appear on the marketing section for the next ${moment(marketing.endAt).diff(moment(marketing.startAt), 'days')} days.`,
+          refference: payment?._id,
+          model_type: modeType.Payments,
+        });
+
+         
+
+        const admin = await User.findOne({role:USER_ROLE.admin})
+        await notificationServices.insertNotificationIntoDb({
+          receiver: admin!._id,
+          message: 'Marketing Payment Received',
+          description: `Shop "${(marketing.shop as IShop).shopName}" has successfully paid for marketing. Their promotion will run for ${moment(marketing.endAt).diff(moment(marketing.startAt), 'days')} days.`,
+          refference: payment?._id,
+          model_type: modeType.Payments,
+        });
+        // await Shop.findByIdAndUpdate(marketing?.shop, {
+        //   marketingEx: moment(marketing!.endAt).utc().toDate(),
+        // });
       }
     }
   } catch (error: any) {

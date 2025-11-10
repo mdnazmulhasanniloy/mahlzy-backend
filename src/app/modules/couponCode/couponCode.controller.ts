@@ -2,8 +2,12 @@ import { Request, Response } from 'express';
 import catchAsync from '../../utils/catchAsync';
 import { couponCodeService } from './couponCode.service';
 import sendResponse from '../../utils/sendResponse';
+import { USER_ROLE } from '../user/user.constants';
 
 const createCouponCode = catchAsync(async (req: Request, res: Response) => {
+  if (req.user.role === USER_ROLE.restaurant) {
+    req.body.resturant = req.user.userId;
+  }
   const result = await couponCodeService.createCouponCode(req.body);
   sendResponse(res, {
     statusCode: 201,

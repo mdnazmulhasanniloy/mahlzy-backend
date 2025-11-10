@@ -21,11 +21,12 @@ export interface IShop {
 
   shopMail: string;
   profile: string;
+  marketingEx: Date;
   shopPhoneNumber: string;
   shopName: string;
   banner: string;
   bannerColor: string;
-  deliveryType: 'pickup' | 'delivery' | 'booth'; 
+  deliveryType: 'pickup' | 'delivery' | 'booth';
   minDeliveryCharge: number;
   shopLocation: ILocation;
   isDeleted: boolean;

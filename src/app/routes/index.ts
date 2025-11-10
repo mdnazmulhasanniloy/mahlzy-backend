@@ -21,6 +21,7 @@ import { openingTimeRoutes } from '../modules/openingTime/openingTime.route';
 import { bookMarkRoutes } from '../modules/bookMark/bookMark.route';
 import { attributeRoutes } from '../modules/attribute/attribute.route';
 import { dashboardRoutes } from '../modules/dashboard/dashboard.route';
+import { marketingRoutes } from '../modules/marketing/marketing.route';
 
 const router = Router();
 const moduleRoutes = [
@@ -115,6 +116,10 @@ const moduleRoutes = [
   {
     path: '/dashboard',
     route: dashboardRoutes,
+  },
+  {
+    path: '/marketing',
+    route: marketingRoutes,
   },
 ];
 moduleRoutes.forEach(route => router.use(route.path, route.route));

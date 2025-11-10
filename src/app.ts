@@ -66,7 +66,7 @@ app.get('/json', async (req: Request, res: Response) => {
 // application routes
 app.use('/api/v1', router);
 app.get('/', (req: Request, res: Response) => {
-  res.send('server is running');
+  res.send('server is running: ' + process.pid);
 });
 app.use(globalErrorHandler);
 

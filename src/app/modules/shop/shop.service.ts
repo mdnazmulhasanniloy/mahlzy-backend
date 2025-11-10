@@ -126,6 +126,66 @@ const getAllShop = async (query: Record<string, any>) => {
     }
   }
 
+  pipeline.push({
+    $lookup: {
+      from: 'marketings',
+      localField: '_id',
+      foreignField: 'shop',
+      as: 'marketingData',
+    },
+  });
+
+  pipeline.push({
+    $addFields: {
+      isMarketingActive: {
+        $gt: [
+          {
+            $size: {
+              $filter: {
+                input: '$marketingData',
+                as: 'm',
+                cond: {
+                  $and: [
+                    { $eq: ['$$m.isPaid', true] },
+                    { $gt: ['$$m.endAt', new Date()] },
+                  ],
+                },
+              },
+            },
+          },
+          0,
+        ],
+      },
+    },
+  });
+
+  pipeline.push({
+    $facet: {
+      withMarketing: [
+        { $match: { isMarketingActive: true } },
+        { $sample: { size: 10 } },
+      ],
+      withoutMarketing: [{ $match: { isMarketingActive: false } }],
+    },
+  });
+
+  pipeline.push({
+    $project: {
+      allShops: { $concatArrays: ['$withMarketing', '$withoutMarketing'] },
+    },
+  });
+
+  pipeline.push({ $unwind: '$allShops' });
+  pipeline.push({ $replaceRoot: { newRoot: '$allShops' } });
+
+  pipeline.push({
+    $sort: {
+      isMarketingActive: -1,
+      avgRating: -1,
+      createdAt: -1,
+    },
+  });
+
   // Pagination and Sorting
   const { page, limit, skip, sort } =
     paginationHelper.calculatePagination(pagination);

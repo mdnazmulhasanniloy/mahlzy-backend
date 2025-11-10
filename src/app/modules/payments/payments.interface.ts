@@ -5,7 +5,7 @@ import { ICampaign } from '../campaign/campaign.interface';
 
 export enum PAYMENT_MODEL_TYPE {
   Orders = 'Orders',
-  Campaign = 'Campaign',
+  Marketing = 'Marketing',
 }
 export interface IPayments {
   _id: string;

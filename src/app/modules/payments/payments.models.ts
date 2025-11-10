@@ -21,7 +21,6 @@ const paymentsSchema = new Schema<IPayments>(
     author: {
       type: Types.ObjectId,
       ref: 'User',
-      required: true,
     },
     adminAmount: {
       type: Number,
