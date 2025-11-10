@@ -1,7 +1,6 @@
 node_modules
 logs/
-**/logs/
-.env.local
+**/logs/ 
 .env
 .vercel
 dist
