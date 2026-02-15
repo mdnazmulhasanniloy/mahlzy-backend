@@ -4,6 +4,10 @@ interface IImages {
   key: string;
   url: string;
 }
+interface subOptions {
+  filed: string;
+  price: number;
+}
 export interface IProducts {
   deleteKey: string[];
   _id: string;
@@ -19,7 +23,9 @@ export interface IProducts {
   sauceLevel: string;
   toppings: ObjectId[];
   discount: number;
-  images: IImages[]; 
+  images: IImages[];
+  primaryOptions: subOptions[];
+  allergyInfo: string;
   totalSell: number;
   isDeleted: boolean;
 }
