@@ -56,6 +56,26 @@ const productsSchema = new Schema<IProducts>(
       //   message: "Sauce level must be one of 'light', 'moderate', or 'extra'",
       // },
     },
+    allergyInfo: {
+      type: String,
+      required: [true, 'Sauce level is required'],
+      // enum: {
+      //   values: ["light", "moderate", "extra"],
+      //   message: "Sauce level must be one of 'light', 'moderate', or 'extra'",
+      // },
+    },
+    primaryOptions: [
+      {
+        filed: {
+          type: String,
+          required: [true, 'primary options filed is required'],
+        },
+        price: {
+          type: Number,
+          required: [true, 'primary options price is required'],
+        },
+      },
+    ],
     toppings: {
       type: [Types.ObjectId],
       ref: 'Topping',
